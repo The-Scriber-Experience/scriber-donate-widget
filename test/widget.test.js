@@ -82,19 +82,133 @@ test('ScriberWidget logic & state math', async (t) => {
     const widget = new ScriberWidget();
 
     assert.strictEqual(widget.options.mode, 'card');
+    assert.strictEqual(widget.options.activeTab, 'donations');
     assert.strictEqual(widget.options.goalCurrent, 45);
     assert.strictEqual(widget.options.goalTarget, 100);
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
     assert.strictEqual(widget.options.activePlatform, 'twitch');
     assert.strictEqual(widget.options.activeLink, 'landing');
     assert.strictEqual(widget.options.autoRotate, false);
+    assert.strictEqual(widget.options.rotateInterval, 20000, 'default rotation is 20 seconds');
+    assert.strictEqual(widget.options.subcycleInterval, 20000, 'default subcycle is 20 seconds');
     assert.strictEqual(widget.rotateTimer, null);
     assert.strictEqual(widget.isCardOpen, false);
     assert.strictEqual(widget.isPlatformsCardOpen, false);
     assert.strictEqual(widget.isLinksCardOpen, false);
+    assert.deepStrictEqual(widget.tabsList, ['donations', 'platforms', 'links'], 'tabsList contains donations, platforms, and links');
     assert.deepStrictEqual(widget.targetsList, ['cashapp', 'bmac', 'amazon'], 'targetsList only contains donation targets');
     assert.deepStrictEqual(widget.platformsList, ['twitch', 'velora', 'youtube', 'kick', 'beam'], 'platformsList contains streaming platforms');
     assert.deepStrictEqual(widget.linksList, ['landing', 'zettelkasten', 'research'], 'linksList contains TSE links');
+  });
+
+  await t.test('cycles through subtabs across windows on nextSubcycle() with 20s intervals', () => {
+    const widget = new ScriberWidget();
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.activeTarget, 'cashapp');
+
+    // Donations subtabs
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.activeTarget, 'bmac');
+
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.activeTarget, 'amazon');
+
+    // Transitions to Platforms window
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.mode, 'platforms');
+    assert.strictEqual(widget.options.activePlatform, 'twitch');
+
+    // Platforms subtabs
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.activePlatform, 'velora');
+
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.activePlatform, 'youtube');
+
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.activePlatform, 'kick');
+
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.activePlatform, 'beam');
+
+    // Transitions to TSE Links window
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'links');
+    assert.strictEqual(widget.options.mode, 'links');
+    assert.strictEqual(widget.options.activeLink, 'landing');
+
+    // Links subtabs
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'links');
+    assert.strictEqual(widget.options.activeLink, 'zettelkasten');
+
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'links');
+    assert.strictEqual(widget.options.activeLink, 'research');
+
+    // Transitions back to Donations window
+    widget.nextSubcycle();
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.mode, 'card');
+    assert.strictEqual(widget.options.activeTarget, 'cashapp');
+  });
+
+  await t.test('cycles tabs sequentially on nextTab(): donations -> platforms -> TSE links -> donations', () => {
+    const widget = new ScriberWidget();
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.mode, 'card');
+
+    // 1st rotation -> platforms
+    widget.nextTab();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.mode, 'platforms');
+    assert.strictEqual(widget.isPlatformsCardOpen, true);
+    assert.strictEqual(widget.isCardOpen, false);
+    assert.strictEqual(widget.isLinksCardOpen, false);
+
+    // 2nd rotation -> TSE links
+    widget.nextTab();
+    assert.strictEqual(widget.options.activeTab, 'links');
+    assert.strictEqual(widget.options.mode, 'links');
+    assert.strictEqual(widget.isLinksCardOpen, true);
+    assert.strictEqual(widget.isCardOpen, false);
+    assert.strictEqual(widget.isPlatformsCardOpen, false);
+
+    // 3rd rotation -> back to donations
+    widget.nextTab();
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.mode, 'card');
+    assert.strictEqual(widget.isCardOpen, true);
+    assert.strictEqual(widget.isPlatformsCardOpen, false);
+    assert.strictEqual(widget.isLinksCardOpen, false);
+
+    // 4th rotation -> platforms again
+    widget.nextTab();
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.mode, 'platforms');
+  });
+
+  await t.test('sets active tab directly on setTab()', () => {
+    const widget = new ScriberWidget();
+
+    widget.setTab('platforms');
+    assert.strictEqual(widget.options.activeTab, 'platforms');
+    assert.strictEqual(widget.options.mode, 'platforms');
+
+    widget.setTab('links');
+    assert.strictEqual(widget.options.activeTab, 'links');
+    assert.strictEqual(widget.options.mode, 'links');
+
+    widget.setTab('donations');
+    assert.strictEqual(widget.options.activeTab, 'donations');
+    assert.strictEqual(widget.options.mode, 'card');
   });
 
   await t.test('cycles targets sequentially on nextTarget()', () => {
@@ -109,6 +223,40 @@ test('ScriberWidget logic & state math', async (t) => {
 
     widget.nextTarget();
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
+  });
+
+  await t.test('cycles platforms sequentially on nextPlatform()', () => {
+    const widget = new ScriberWidget();
+    assert.strictEqual(widget.options.activePlatform, 'twitch');
+
+    widget.nextPlatform();
+    assert.strictEqual(widget.options.activePlatform, 'velora');
+
+    widget.nextPlatform();
+    assert.strictEqual(widget.options.activePlatform, 'youtube');
+
+    widget.nextPlatform();
+    assert.strictEqual(widget.options.activePlatform, 'kick');
+
+    widget.nextPlatform();
+    assert.strictEqual(widget.options.activePlatform, 'beam');
+
+    widget.nextPlatform();
+    assert.strictEqual(widget.options.activePlatform, 'twitch');
+  });
+
+  await t.test('cycles links sequentially on nextLink()', () => {
+    const widget = new ScriberWidget();
+    assert.strictEqual(widget.options.activeLink, 'landing');
+
+    widget.nextLink();
+    assert.strictEqual(widget.options.activeLink, 'zettelkasten');
+
+    widget.nextLink();
+    assert.strictEqual(widget.options.activeLink, 'research');
+
+    widget.nextLink();
+    assert.strictEqual(widget.options.activeLink, 'landing');
   });
 
   await t.test('sets active platform correctly on setPlatform()', () => {

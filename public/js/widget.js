@@ -158,6 +158,7 @@
   function ScriberWidget(options) {
     this.options = Object.assign({
       mode: 'card', // card | platforms | links | goal | ticker | dock
+      activeTab: 'donations',
       activeTarget: 'cashapp',
       activePlatform: 'twitch',
       activeLink: 'landing',
@@ -165,7 +166,8 @@
       align: 'top-left',
       soundEnabled: true,
       autoRotate: false,
-      rotateInterval: 12000,
+      rotateInterval: 20000,
+      subcycleInterval: 20000,
       goalCurrent: 45,
       goalTarget: 100,
       goalTitle: 'Stream Upgrade Goal',
@@ -173,10 +175,14 @@
       recentAmount: '$25.00'
     }, options || {});
 
+    this.tabsList = ['donations', 'platforms', 'links'];
+    this.currentTabIndex = 0;
     this.targetsList = ['cashapp', 'bmac', 'amazon'];
-    this.platformsList = ['twitch', 'velora', 'youtube', 'kick', 'beam'];
-    this.linksList = ['landing', 'zettelkasten', 'research'];
     this.currentTargetIndex = 0;
+    this.platformsList = ['twitch', 'velora', 'youtube', 'kick', 'beam'];
+    this.currentPlatformIndex = 0;
+    this.linksList = ['landing', 'zettelkasten', 'research'];
+    this.currentLinkIndex = 0;
     this.rotateTimer = null;
     this.confetti = null;
     this.isCardOpen = false;
@@ -185,13 +191,63 @@
     this.isDockOpen = false;
 
     this.parseURLParams();
+
+    if (this.options.activeTab) {
+      var normTab = this.options.activeTab.toLowerCase();
+      if (normTab === 'card') normTab = 'donations';
+      var tIdx = this.tabsList.indexOf(normTab);
+      if (tIdx !== -1) {
+        this.currentTabIndex = tIdx;
+        this.options.activeTab = normTab;
+      }
+    } else if (this.options.mode) {
+      var m = this.options.mode.toLowerCase();
+      if (m === 'card' || m === 'donations') {
+        this.options.activeTab = 'donations';
+        this.currentTabIndex = 0;
+      } else if (m === 'platforms') {
+        this.options.activeTab = 'platforms';
+        this.currentTabIndex = 1;
+      } else if (m === 'links') {
+        this.options.activeTab = 'links';
+        this.currentTabIndex = 2;
+      }
+    }
   }
 
   ScriberWidget.prototype.parseURLParams = function () {
     if (typeof window === 'undefined' || !window.location) return;
     var params = new URLSearchParams(window.location.search);
 
-    if (params.has('mode')) this.options.mode = params.get('mode');
+    if (params.has('mode')) {
+      this.options.mode = params.get('mode');
+      if (this.options.mode === 'card' || this.options.mode === 'donations') {
+        this.options.activeTab = 'donations';
+        this.currentTabIndex = 0;
+      } else if (this.options.mode === 'platforms') {
+        this.options.activeTab = 'platforms';
+        this.currentTabIndex = 1;
+      } else if (this.options.mode === 'links') {
+        this.options.activeTab = 'links';
+        this.currentTabIndex = 2;
+      }
+    }
+    if (params.has('tab')) {
+      var t = params.get('tab').toLowerCase();
+      if (t === 'donations' || t === 'card') {
+        this.options.activeTab = 'donations';
+        this.options.mode = 'card';
+        this.currentTabIndex = 0;
+      } else if (t === 'platforms') {
+        this.options.activeTab = 'platforms';
+        this.options.mode = 'platforms';
+        this.currentTabIndex = 1;
+      } else if (t === 'links' || t === 'tse-links' || t === 'tselinks') {
+        this.options.activeTab = 'links';
+        this.options.mode = 'links';
+        this.currentTabIndex = 2;
+      }
+    }
     if (params.has('target') && DONATION_TARGETS[params.get('target')]) {
       this.options.activeTarget = params.get('target');
     }
@@ -205,7 +261,14 @@
     if (params.has('align')) this.options.align = params.get('align');
     if (params.has('sound')) this.options.soundEnabled = params.get('sound') !== 'false';
     if (params.has('autoRotate')) this.options.autoRotate = params.get('autoRotate') === 'true';
-    if (params.has('interval')) this.options.rotateInterval = (parseInt(params.get('interval'), 10) || 12) * 1000;
+    if (params.has('interval')) {
+      this.options.rotateInterval = (parseInt(params.get('interval'), 10) || 20) * 1000;
+      this.options.subcycleInterval = this.options.rotateInterval;
+    }
+    if (params.has('subcycle')) {
+      this.options.subcycleInterval = (parseInt(params.get('subcycle'), 10) || 20) * 1000;
+      this.options.rotateInterval = this.options.subcycleInterval;
+    }
     if (params.has('goal')) this.options.goalTarget = parseFloat(params.get('goal')) || 100;
     if (params.has('current')) this.options.goalCurrent = parseFloat(params.get('current')) || 45;
     if (params.has('title')) this.options.goalTitle = params.get('title');
@@ -213,6 +276,10 @@
 
     var idx = this.targetsList.indexOf(this.options.activeTarget);
     if (idx !== -1) this.currentTargetIndex = idx;
+    var pIdx = this.platformsList.indexOf(this.options.activePlatform);
+    if (pIdx !== -1) this.currentPlatformIndex = pIdx;
+    var lIdx = this.linksList.indexOf(this.options.activeLink);
+    if (lIdx !== -1) this.currentLinkIndex = lIdx;
   };
 
   ScriberWidget.prototype.init = function () {
@@ -292,7 +359,12 @@
     var allWindowTabs = document.querySelectorAll('.window-nav-tabs .window-tab-btn');
     allWindowTabs.forEach(function (btn) {
       var win = btn.getAttribute('data-window');
-      if (win === activeWindow) {
+      if (
+        win === activeWindow ||
+        (win === 'card' && (activeWindow === 'donations' || activeWindow === 'card')) ||
+        (win === 'donations' && (activeWindow === 'donations' || activeWindow === 'card')) ||
+        (win === 'links' && (activeWindow === 'links' || activeWindow === 'tse-links' || activeWindow === 'tse links'))
+      ) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
@@ -407,6 +479,8 @@
   ScriberWidget.prototype.setPlatform = function (platformKey) {
     if (!PLATFORMS[platformKey]) return;
     this.options.activePlatform = platformKey;
+    var idx = this.platformsList.indexOf(platformKey);
+    if (idx !== -1) this.currentPlatformIndex = idx;
     this.renderActivePlatform();
   };
 
@@ -454,6 +528,8 @@
   ScriberWidget.prototype.setLink = function (linkKey) {
     if (!TSE_LINKS[linkKey]) return;
     this.options.activeLink = linkKey;
+    var idx = this.linksList.indexOf(linkKey);
+    if (idx !== -1) this.currentLinkIndex = idx;
     this.renderActiveLink();
   };
 
@@ -518,12 +594,89 @@
     this.setTarget(nextKey);
   };
 
+  ScriberWidget.prototype.nextPlatform = function () {
+    this.currentPlatformIndex = (this.currentPlatformIndex + 1) % this.platformsList.length;
+    var nextKey = this.platformsList[this.currentPlatformIndex];
+    this.setPlatform(nextKey);
+  };
+
+  ScriberWidget.prototype.nextLink = function () {
+    this.currentLinkIndex = (this.currentLinkIndex + 1) % this.linksList.length;
+    var nextKey = this.linksList[this.currentLinkIndex];
+    this.setLink(nextKey);
+  };
+
+  ScriberWidget.prototype.nextTab = function () {
+    this.currentTabIndex = (this.currentTabIndex + 1) % this.tabsList.length;
+    var nextTabName = this.tabsList[this.currentTabIndex];
+    this.setTab(nextTabName);
+  };
+
+  ScriberWidget.prototype.nextSubtab = function () {
+    return this.nextSubcycle();
+  };
+
+  ScriberWidget.prototype.nextSubcycle = function () {
+    var activeTab = this.options.activeTab || this.tabsList[this.currentTabIndex] || 'donations';
+    var normTab = String(activeTab).toLowerCase().trim();
+
+    if (normTab === 'card' || normTab === 'donations' || normTab === 'donation') {
+      if (this.currentTargetIndex < this.targetsList.length - 1) {
+        this.currentTargetIndex++;
+        this.setTarget(this.targetsList[this.currentTargetIndex]);
+      } else {
+        this.currentTargetIndex = 0;
+        this.setTab('platforms');
+        this.currentPlatformIndex = 0;
+        this.setPlatform(this.platformsList[0]);
+      }
+    } else if (normTab === 'platforms' || normTab === 'platform') {
+      if (this.currentPlatformIndex < this.platformsList.length - 1) {
+        this.currentPlatformIndex++;
+        this.setPlatform(this.platformsList[this.currentPlatformIndex]);
+      } else {
+        this.currentPlatformIndex = 0;
+        this.setTab('links');
+        this.currentLinkIndex = 0;
+        this.setLink(this.linksList[0]);
+      }
+    } else if (normTab === 'links' || normTab === 'tse links' || normTab === 'tse-links' || normTab === 'tselinks' || normTab === 'link') {
+      if (this.currentLinkIndex < this.linksList.length - 1) {
+        this.currentLinkIndex++;
+        this.setLink(this.linksList[this.currentLinkIndex]);
+      } else {
+        this.currentLinkIndex = 0;
+        this.setTab('donations');
+        this.currentTargetIndex = 0;
+        this.setTarget(this.targetsList[0]);
+      }
+    } else {
+      this.nextTab();
+    }
+  };
+
+  ScriberWidget.prototype.setTab = function (tabName) {
+    if (!tabName) return;
+    var normalized = String(tabName).toLowerCase().trim();
+    if (normalized === 'donations' || normalized === 'card' || normalized === 'donation') {
+      this.currentTabIndex = 0;
+      this.toggleCard(true);
+    } else if (normalized === 'platforms' || normalized === 'platform') {
+      this.currentTabIndex = 1;
+      this.togglePlatformsCard(true);
+    } else if (normalized === 'links' || normalized === 'tse links' || normalized === 'tse-links' || normalized === 'tselinks' || normalized === 'link') {
+      this.currentTabIndex = 2;
+      this.toggleLinksCard(true);
+    }
+  };
+
   ScriberWidget.prototype.startAutoRotate = function () {
     this.stopAutoRotate();
     var self = this;
+    var interval = this.options.subcycleInterval || this.options.rotateInterval || 20000;
     this.rotateTimer = setInterval(function () {
-      self.nextTarget();
-    }, this.options.rotateInterval);
+      self.nextSubcycle();
+    }, interval);
   };
 
   ScriberWidget.prototype.stopAutoRotate = function () {
@@ -534,64 +687,83 @@
   };
 
   ScriberWidget.prototype.toggleCard = function (forceState) {
-    var card = document.getElementById('tse-card-mode');
-    if (!card) return;
-
     this.isCardOpen = (forceState !== undefined) ? forceState : !this.isCardOpen;
 
     if (this.isCardOpen) {
-      if (this.isPlatformsCardOpen) {
-        this.togglePlatformsCard(false);
+      this.isPlatformsCardOpen = false;
+      this.isLinksCardOpen = false;
+      this.options.mode = 'card';
+      this.options.activeTab = 'donations';
+      this.currentTabIndex = 0;
+      if (typeof document !== 'undefined') {
+        var card = document.getElementById('tse-card-mode');
+        var platformsCard = document.getElementById('tse-platforms-mode');
+        var linksCard = document.getElementById('tse-links-mode');
+        if (card) card.classList.remove('hidden');
+        if (platformsCard) platformsCard.classList.add('hidden');
+        if (linksCard) linksCard.classList.add('hidden');
+        this.updateWindowTabsActive('card');
+        this.renderActiveTarget();
       }
-      if (this.isLinksCardOpen) {
-        this.toggleLinksCard(false);
-      }
-      card.classList.remove('hidden');
-      this.updateWindowTabsActive('card');
     } else {
-      card.classList.add('hidden');
+      if (typeof document !== 'undefined') {
+        var card = document.getElementById('tse-card-mode');
+        if (card) card.classList.add('hidden');
+      }
     }
   };
 
   ScriberWidget.prototype.togglePlatformsCard = function (forceState) {
-    var card = document.getElementById('tse-platforms-mode');
-    if (!card) return;
-
     this.isPlatformsCardOpen = (forceState !== undefined) ? forceState : !this.isPlatformsCardOpen;
 
     if (this.isPlatformsCardOpen) {
-      if (this.isCardOpen) {
-        this.toggleCard(false);
+      this.isCardOpen = false;
+      this.isLinksCardOpen = false;
+      this.options.mode = 'platforms';
+      this.options.activeTab = 'platforms';
+      this.currentTabIndex = 1;
+      if (typeof document !== 'undefined') {
+        var card = document.getElementById('tse-card-mode');
+        var platformsCard = document.getElementById('tse-platforms-mode');
+        var linksCard = document.getElementById('tse-links-mode');
+        if (platformsCard) platformsCard.classList.remove('hidden');
+        if (card) card.classList.add('hidden');
+        if (linksCard) linksCard.classList.add('hidden');
+        this.updateWindowTabsActive('platforms');
+        this.renderActivePlatform();
       }
-      if (this.isLinksCardOpen) {
-        this.toggleLinksCard(false);
-      }
-      card.classList.remove('hidden');
-      this.updateWindowTabsActive('platforms');
-      this.renderActivePlatform();
     } else {
-      card.classList.add('hidden');
+      if (typeof document !== 'undefined') {
+        var platformsCard = document.getElementById('tse-platforms-mode');
+        if (platformsCard) platformsCard.classList.add('hidden');
+      }
     }
   };
 
   ScriberWidget.prototype.toggleLinksCard = function (forceState) {
-    var card = document.getElementById('tse-links-mode');
-    if (!card) return;
-
     this.isLinksCardOpen = (forceState !== undefined) ? forceState : !this.isLinksCardOpen;
 
     if (this.isLinksCardOpen) {
-      if (this.isCardOpen) {
-        this.toggleCard(false);
+      this.isCardOpen = false;
+      this.isPlatformsCardOpen = false;
+      this.options.mode = 'links';
+      this.options.activeTab = 'links';
+      this.currentTabIndex = 2;
+      if (typeof document !== 'undefined') {
+        var card = document.getElementById('tse-card-mode');
+        var platformsCard = document.getElementById('tse-platforms-mode');
+        var linksCard = document.getElementById('tse-links-mode');
+        if (linksCard) linksCard.classList.remove('hidden');
+        if (card) card.classList.add('hidden');
+        if (platformsCard) platformsCard.classList.add('hidden');
+        this.updateWindowTabsActive('links');
+        this.renderActiveLink();
       }
-      if (this.isPlatformsCardOpen) {
-        this.togglePlatformsCard(false);
-      }
-      card.classList.remove('hidden');
-      this.updateWindowTabsActive('links');
-      this.renderActiveLink();
     } else {
-      card.classList.add('hidden');
+      if (typeof document !== 'undefined') {
+        var linksCard = document.getElementById('tse-links-mode');
+        if (linksCard) linksCard.classList.add('hidden');
+      }
     }
   };
 

@@ -86,8 +86,8 @@ Customize the overlay directly via the Browser Source URL:
 | `current` | Number (e.g. `45`, `80`) | `45` | Currently raised donation amount in $ |
 | `title` | Text (URL encoded) | `Stream Upgrade Goal` | Goal title text |
 | `sound` | `true`, `false` | `true` | Enable/disable audio chimes |
-| `autoRotate` | `true`, `false` | `false` | Automatically cycle donation targets |
-| `interval` | Number (in seconds) | `12` | Rotation interval between methods |
+| `autoRotate` | `true`, `false` | `false` | Automatically cycle through subtabs and windows (donations -> platforms -> TSE links) |
+| `interval` / `subcycle` | Number (in seconds) | `20` | Subcycle duration per subtab before window transition |
 | `testMode` | `true`, `false` | `false` | Shows background for standalone preview |
 
 ### Example Preset URLs for OBS:
