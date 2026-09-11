@@ -299,7 +299,7 @@ body.test-mode {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   min-width: 160px;
   flex-shrink: 0;
 }
@@ -314,45 +314,33 @@ body.test-mode {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
-.pill-subtitle {
-  font-size: 10.5px;
-  color: #cbd5e1;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-inter);
-}
-
-.pill-active-target {
-  color: #00f2ff;
-  font-weight: 600;
-  font-family: var(--font-aclonica);
-}
-
 /* Multistream Platforms Badge Cluster */
 .multistream-cluster {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
-  background: rgba(0, 0, 0, 0.55);
+  padding: 4px 9px;
+  background: rgba(0, 0, 0, 0.45);
   border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  width: fit-content;
 }
 
 .platform-dot {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   transition: all 0.25s ease;
   position: relative;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .platform-dot.active {
@@ -370,8 +358,8 @@ body.test-mode {
   position: absolute;
   top: -2px;
   right: -2px;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   background: #30dd8a;
   border-radius: 50%;
   box-shadow: 0 0 6px #30dd8a;
@@ -385,13 +373,31 @@ body.test-mode {
 }
 
 .pill-action-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
   padding: 6px 14px;
   height: 34px;
   flex-shrink: 0;
+  text-decoration: none;
+}
+
+.btn-favicon-emoji {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+#pill-action-btn {
+  margin-left: auto;
+}
+
+.pill-landing-btn {
+  white-space: nowrap;
 }
 
 /* =========================================================
@@ -520,6 +526,36 @@ body.test-mode {
 .tab-btn.tab-amazon.active {
   background: var(--gradient-amazon);
   box-shadow: 0 2px 10px rgba(255, 153, 0, 0.5);
+}
+
+.tab-btn.tab-twitch.active {
+  background: linear-gradient(135deg, #a970ff, #772ce8);
+  box-shadow: 0 2px 10px rgba(169, 112, 255, 0.5);
+  color: #fff;
+}
+
+.tab-btn.tab-velora.active {
+  background: linear-gradient(135deg, #00f2ff, #00a8ff);
+  box-shadow: 0 2px 10px rgba(0, 242, 255, 0.5);
+  color: #000;
+}
+
+.tab-btn.tab-youtube.active {
+  background: linear-gradient(135deg, #ff0000, #cc0000);
+  box-shadow: 0 2px 10px rgba(255, 0, 0, 0.5);
+  color: #fff;
+}
+
+.tab-btn.tab-kick.active {
+  background: linear-gradient(135deg, #53fc18, #2e9e05);
+  box-shadow: 0 2px 10px rgba(83, 252, 24, 0.5);
+  color: #000;
+}
+
+.tab-btn.tab-beam.active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+  color: #fff;
 }
 
 /* QR Code Display Container */

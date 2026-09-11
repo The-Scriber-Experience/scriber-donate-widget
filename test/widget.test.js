@@ -60,6 +60,7 @@ test('Multistream Platforms & Targets configuration integrity', async (t) => {
 
     assert.strictEqual(DONATION_TARGETS.cashapp.handle, '$renzoscriber');
     assert.strictEqual(DONATION_TARGETS.bmac.handle, 'renzoscriber');
+    assert.strictEqual(DONATION_TARGETS.landing.name, 'TSE Landing Page');
   });
 });
 
@@ -75,8 +76,13 @@ test('ScriberWidget logic & state math', async (t) => {
     assert.strictEqual(widget.options.goalCurrent, 50);
     assert.strictEqual(widget.options.goalTarget, 200);
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
+    assert.strictEqual(widget.options.activePlatform, 'twitch');
     assert.strictEqual(widget.options.autoRotate, false);
     assert.strictEqual(widget.rotateTimer, null);
+    assert.strictEqual(widget.isCardOpen, false);
+    assert.strictEqual(widget.isPlatformsCardOpen, false);
+    assert.deepStrictEqual(widget.targetsList, ['cashapp', 'bmac', 'amazon'], 'targetsList only contains donation targets');
+    assert.deepStrictEqual(widget.platformsList, ['twitch', 'velora', 'youtube', 'kick', 'beam'], 'platformsList contains streaming platforms');
   });
 
   await t.test('cycles targets sequentially on nextTarget()', () => {
@@ -90,10 +96,18 @@ test('ScriberWidget logic & state math', async (t) => {
     assert.strictEqual(widget.options.activeTarget, 'amazon');
 
     widget.nextTarget();
-    assert.strictEqual(widget.options.activeTarget, 'landing');
-
-    widget.nextTarget();
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
+  });
+
+  await t.test('sets active platform correctly on setPlatform()', () => {
+    const widget = new ScriberWidget();
+    assert.strictEqual(widget.options.activePlatform, 'twitch');
+
+    widget.setPlatform('youtube');
+    assert.strictEqual(widget.options.activePlatform, 'youtube');
+
+    widget.setPlatform('kick');
+    assert.strictEqual(widget.options.activePlatform, 'kick');
   });
 });
 
@@ -123,6 +137,17 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(html.includes('The Scriber Experience'), 'Serves index.html correctly');
     assert.ok(html.includes('id="tse-pill-mode"'), 'Contains pill mode element');
     assert.ok(html.includes('id="tse-card-mode"'), 'Contains card mode element');
+    assert.ok(html.includes('id="tse-platforms-mode"'), 'Contains platforms card mode element');
+    assert.ok(html.includes('id="pill-platforms-btn"'), 'Contains dedicated platforms button in minimized view');
+    assert.ok(html.includes('src="./assets/images/favicon.png"'), 'Favicon image is used in index.html');
+    assert.ok(html.includes('class="btn-favicon-emoji emoji"'), 'Favicon image is used as the emoji at the beginning of the button text');
+    assert.ok(html.includes('Platforms</span>'), 'Button text includes Platforms');
+    assert.ok(html.includes('id="platforms-tabs"'), 'Contains platforms tabs container');
+    assert.ok(html.includes('id="platform-qr-code-box"'), 'Contains platform QR code box');
+    assert.ok(!html.includes('id="multistream-cluster"'), 'Replaced old multistream cluster row with platforms button');
+    assert.ok(html.includes('id="pill-landing-btn"'), 'Contains dedicated landing page button in minimized view');
+    assert.ok(html.includes('TSE Landing Page'), 'Contains TSE Landing Page name');
+    assert.ok(!html.includes('TSE All Links'), 'Does not contain TSE All Links');
   });
 
   await t.test('serves CSS stylesheet with glassmorphism, space background & gradients', async () => {
@@ -134,6 +159,8 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(css.includes('spacebackground.jpg') || css.includes('spacebackground.png'), 'Contains space background reference');
     assert.ok(css.includes('min-width: 580px'), 'Contains wider compact pill dimensions');
     assert.ok(css.includes('width: 480px'), 'Contains wider QR card dimensions');
+    assert.ok(css.includes('.btn-favicon-emoji'), 'Contains btn-favicon-emoji style');
+    assert.ok(css.includes('.tab-twitch.active'), 'Contains platform tab active gradient style');
   });
 
   await t.test('serves spacebackground image assets correctly', async () => {

@@ -45,28 +45,27 @@
     <!-- ====================================================
          VIEW 1: COMPACT PILL / ON-STREAM INTERACTIVE BUTTON
          ==================================================== -->
-    <div id="tse-pill-mode" class="glass-panel glow-border widget-compact-pill" title="Click to view QR & Donation Links">
+    <div id="tse-pill-mode" class="glass-panel glow-border widget-compact-pill" title="The Scriber Experience">
       <img src="./assets/images/logo.png" alt="TSE Logo" class="brand-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
       
       <div class="pill-info">
         <div class="pill-title eigenscribe-gradient-text">
           <span>The Scriber Experience</span>
         </div>
-        <div class="pill-subtitle">
-          <span>Support via:</span>
-          <span id="pill-target-name" class="pill-active-target">Cash App ($renzoscriber)</span>
-        </div>
-      </div>
-
-      <!-- Multistream Live Platform Status Dots -->
-      <div id="multistream-cluster" class="multistream-cluster" title="Multistream active channels">
-        <!-- Injected via JavaScript -->
       </div>
 
       <button id="pill-action-btn" class="btn-hover color-5 pill-action-btn">
         <span id="pill-action-emoji" class="emoji">💸</span>
         <span id="pill-action-label">Donate</span>
       </button>
+      <button id="pill-platforms-btn" class="btn-hover color-3 pill-action-btn" title="Platforms">
+        <img src="./assets/images/favicon.png" alt="Platforms" class="btn-favicon-emoji emoji">
+        <span>Platforms</span>
+      </button>
+      <a id="pill-landing-btn" href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 pill-action-btn pill-landing-btn" title="TSE Landing Page">
+        <span class="emoji">🌊</span>
+        <span>TSE Landing Page</span>
+      </a>
     </div>
 
     <!-- ====================================================
@@ -78,7 +77,6 @@
           <img src="./assets/images/logo.png" alt="TSE Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
           <div>
             <div class="qr-card-title eigenscribe-gradient-text">The Scriber Experience</div>
-            <div class="qr-card-subtitle">Scan to tip or support the stream</div>
           </div>
         </div>
         <button id="close-card-btn" class="close-btn" title="Close">✕</button>
@@ -101,6 +99,40 @@
 
       <div id="qr-handle-display" class="qr-handle-badge" title="Click to copy link">
         💸 $renzoscriber <span style="opacity:0.6;font-size:9px">📋 copy</span>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         VIEW 2B: EXPANDED QR CODE PLATFORMS CARD
+         ==================================================== -->
+    <div id="tse-platforms-mode" class="glass-panel glow-border widget-qr-card hidden">
+      <div class="qr-card-header">
+        <div class="qr-card-brand">
+          <img src="./assets/images/favicon.png" alt="Platforms Logo" onerror="this.src='./assets/images/logo.png'">
+          <div>
+            <div class="qr-card-title eigenscribe-gradient-text">Platforms</div>
+          </div>
+        </div>
+        <button id="close-platforms-btn" class="close-btn" title="Close">✕</button>
+      </div>
+
+      <!-- Multistream Platform Tabs (Twitch, Velora, YouTube, Kick, BEAM) -->
+      <div id="platforms-tabs" class="donation-method-tabs">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- QR Code Display Box with Auto Generated Crisp SVG -->
+      <div id="platform-qr-code-box" class="qr-container">
+        <!-- Dynamic QR SVG Injected Here -->
+      </div>
+
+      <div class="qr-scan-hint">
+        <span>📱 Scan with camera to open</span>
+        <span id="platform-qr-method-name" class="neon-cyan-text">Twitch</span>
+      </div>
+
+      <div id="platform-qr-handle-display" class="qr-handle-badge" title="Click to copy link">
+        😈 twitch.tv/renzoscriber <span style="opacity:0.6;font-size:9px">📋 copy</span>
       </div>
     </div>
 
@@ -197,6 +229,7 @@
           <select id="dock-mode-select" class="control-input" style="width:100%;">
             <option value="compact">Compact Pill (Default)</option>
             <option value="card">On-Stream QR Card</option>
+            <option value="platforms">Platforms QR Card</option>
             <option value="goal">Goal Progress Bar</option>
             <option value="ticker">Full Bottom Ticker</option>
             <option value="dock">Control Dock</option>
@@ -248,7 +281,7 @@
         <a href="https://cash.app/$renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-5 dock-channel-btn"><span class="emoji">💸</span> Cash App</a>
         <a href="https://www.buymeacoffee.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-2 dock-channel-btn"><span class="emoji">☕</span> Buy Me a Coffee</a>
         <a href="https://www.amazon.com/hz/wishlist/ls/4YHE4NZD3W98?ref_=wl_share" target="_blank" rel="noopener noreferrer" class="btn-hover color-4 dock-channel-btn"><span class="emoji">📦</span> Amazon Wishlist</a>
-        <a href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 dock-channel-btn"><span class="emoji">🌊</span> TSE Portal</a>
+        <a href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 dock-channel-btn"><span class="emoji">🌊</span> TSE Landing Page</a>
       </div>
 
       <div style="font-size:10px;color:#94a3b8;text-align:center;">

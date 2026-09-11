@@ -14,11 +14,11 @@
 
   // Multistream Platforms Registry
   var PLATFORMS = {
-    twitch: { id: 'twitch', name: 'Twitch', icon: '😈', url: 'https://www.twitch.tv/renzoscriber', color: '#a970ff' },
-    velora: { id: 'velora', name: 'Velora', icon: '✨', url: 'https://velora.tv/renzoscriber', color: '#00f2ff' },
-    youtube: { id: 'youtube', name: 'YouTube', icon: '❤️', url: 'https://www.youtube.com/@sofiascriber', color: '#ff0000' },
-    kick: { id: 'kick', name: 'Kick', icon: '🤢', url: 'https://www.kick.com/renzoscriber', color: '#53fc18' },
-    beam: { id: 'beam', name: 'BEAM', icon: '💠', url: 'https://beamstream.gg/renzoscriber', color: '#3b82f6' }
+    twitch: { id: 'twitch', name: 'Twitch', icon: '😈', url: 'https://www.twitch.tv/renzoscriber', color: '#a970ff', handle: 'twitch.tv/renzoscriber' },
+    velora: { id: 'velora', name: 'Velora', icon: '✨', url: 'https://velora.tv/renzoscriber', color: '#00f2ff', handle: 'velora.tv/renzoscriber' },
+    youtube: { id: 'youtube', name: 'YouTube', icon: '❤️', url: 'https://www.youtube.com/@sofiascriber', color: '#ff0000', handle: 'youtube.com/@sofiascriber' },
+    kick: { id: 'kick', name: 'Kick', icon: '🤢', url: 'https://www.kick.com/renzoscriber', color: '#53fc18', handle: 'kick.com/renzoscriber' },
+    beam: { id: 'beam', name: 'BEAM', icon: '💠', url: 'https://beamstream.gg/renzoscriber', color: '#3b82f6', handle: 'beamstream.gg/renzoscriber' }
   };
 
   // Donation Targets Registry
@@ -55,13 +55,13 @@
     },
     landing: {
       id: 'landing',
-      name: 'TSE All Links',
+      name: 'TSE Landing Page',
       icon: '🌊',
       handle: 'the-scriber-experience',
       url: 'https://the-scriber-experience.github.io/tse-landing-page/',
       color: '#14B5FF',
       colorClass: 'color-9',
-      badgeText: 'TSE Portal'
+      badgeText: 'TSE Landing Page'
     }
   };
 
@@ -123,9 +123,9 @@
 
   function ScriberWidget(options) {
     this.options = Object.assign({
-      mode: 'compact', // compact | card | goal | ticker | dock
+      mode: 'compact', // compact | card | platforms | goal | ticker | dock
       activeTarget: 'cashapp',
-      activePlatform: 'all',
+      activePlatform: 'twitch',
       scale: 1,
       align: 'top-left',
       soundEnabled: true,
@@ -138,11 +138,13 @@
       recentAmount: '$25.00'
     }, options || {});
 
-    this.targetsList = ['cashapp', 'bmac', 'amazon', 'landing'];
+    this.targetsList = ['cashapp', 'bmac', 'amazon'];
+    this.platformsList = ['twitch', 'velora', 'youtube', 'kick', 'beam'];
     this.currentTargetIndex = 0;
     this.rotateTimer = null;
     this.confetti = null;
     this.isCardOpen = false;
+    this.isPlatformsCardOpen = false;
     this.isDockOpen = false;
 
     this.parseURLParams();
@@ -156,7 +158,9 @@
     if (params.has('target') && DONATION_TARGETS[params.get('target')]) {
       this.options.activeTarget = params.get('target');
     }
-    if (params.has('platform')) this.options.activePlatform = params.get('platform');
+    if (params.has('platform') && PLATFORMS[params.get('platform')]) {
+      this.options.activePlatform = params.get('platform');
+    }
     if (params.has('scale')) this.options.scale = parseFloat(params.get('scale')) || 1;
     if (params.has('align')) this.options.align = params.get('align');
     if (params.has('sound')) this.options.soundEnabled = params.get('sound') !== 'false';
@@ -175,6 +179,7 @@
     this.setupDOM();
     this.applyConfiguration();
     this.renderActiveTarget();
+    this.renderActivePlatform();
     this.updateGoalHUD();
     this.attachEvents();
     this.connectLiveEvents();
@@ -223,41 +228,43 @@
   ScriberWidget.prototype.updateVisibilityByMode = function () {
     var pill = document.getElementById('tse-pill-mode');
     var qrCard = document.getElementById('tse-card-mode');
+    var platformsCard = document.getElementById('tse-platforms-mode');
     var goalCard = document.getElementById('tse-goal-mode');
     var tickerBar = document.getElementById('tse-ticker-mode');
     var dockPanel = document.getElementById('tse-dock-mode');
 
-    [pill, qrCard, goalCard, tickerBar, dockPanel].forEach(function (el) {
+    [pill, qrCard, platformsCard, goalCard, tickerBar, dockPanel].forEach(function (el) {
       if (el) el.classList.add('hidden');
     });
 
     if (this.options.mode === 'compact' && pill) pill.classList.remove('hidden');
     else if (this.options.mode === 'card' && qrCard) qrCard.classList.remove('hidden');
+    else if (this.options.mode === 'platforms' && platformsCard) platformsCard.classList.remove('hidden');
     else if (this.options.mode === 'goal' && goalCard) goalCard.classList.remove('hidden');
     else if (this.options.mode === 'ticker' && tickerBar) tickerBar.classList.remove('hidden');
     else if (this.options.mode === 'dock' && dockPanel) dockPanel.classList.remove('hidden');
   };
 
   ScriberWidget.prototype.applyConfiguration = function () {
-    // Populate platforms
-    var cluster = document.getElementById('multistream-cluster');
-    if (cluster) {
-      cluster.innerHTML = '';
-      Object.keys(PLATFORMS).forEach(function (key) {
+    // Populate platform tabs in platforms card
+    var platformTabsContainer = document.getElementById('platforms-tabs');
+    if (platformTabsContainer) {
+      platformTabsContainer.innerHTML = '';
+      this.platformsList.forEach(function (key) {
         var plat = PLATFORMS[key];
-        var dot = document.createElement('div');
-        dot.className = 'platform-dot' + (this.options.activePlatform === key || this.options.activePlatform === 'all' ? ' active' : '');
-        dot.title = plat.name + ' - ' + plat.url;
-        dot.innerHTML = '<span>' + plat.icon + '</span><span class="pulse-indicator"></span>';
-        dot.addEventListener('click', function (e) {
+        if (!plat) return;
+        var tab = document.createElement('button');
+        tab.className = 'tab-btn tab-' + key + (this.options.activePlatform === key ? ' active' : '');
+        tab.innerHTML = '<span>' + plat.icon + '</span> ' + plat.name;
+        tab.addEventListener('click', function (e) {
           e.stopPropagation();
           this.setPlatform(key);
         }.bind(this));
-        cluster.appendChild(dot);
+        platformTabsContainer.appendChild(tab);
       }.bind(this));
     }
 
-    // Populate tab buttons
+    // Populate donation tab buttons in donate card
     var tabsContainer = document.getElementById('donation-tabs');
     if (tabsContainer) {
       tabsContainer.innerHTML = '';
@@ -338,18 +345,50 @@
   };
 
   ScriberWidget.prototype.setPlatform = function (platformKey) {
+    if (!PLATFORMS[platformKey]) return;
     this.options.activePlatform = platformKey;
-    if (typeof document === 'undefined') return;
-    var dots = document.querySelectorAll('.platform-dot');
-    dots.forEach(function (dot, i) {
-      var key = Object.keys(PLATFORMS)[i];
-      if (platformKey === 'all' || platformKey === key) {
-        dot.classList.add('active');
+    this.renderActivePlatform();
+  };
+
+  ScriberWidget.prototype.renderActivePlatform = function () {
+    var platKey = this.options.activePlatform;
+    if (!PLATFORMS[platKey]) {
+      platKey = 'twitch';
+    }
+    var plat = PLATFORMS[platKey];
+    if (typeof document === 'undefined' || !plat) return;
+
+    // Update Platforms Card
+    var qrContainer = document.getElementById('platform-qr-code-box');
+    var qrHandle = document.getElementById('platform-qr-handle-display');
+    var qrMethodName = document.getElementById('platform-qr-method-name');
+
+    if (qrMethodName) qrMethodName.textContent = plat.name;
+    if (qrHandle) {
+      var displayHandle = plat.handle || (plat.url.replace(/^https?:\/\/(www\.)?/, ''));
+      qrHandle.innerHTML = plat.icon + ' ' + displayHandle + ' <span style="opacity:0.6;font-size:9px">📋 copy</span>';
+    }
+
+    if (qrContainer && typeof QRCodeGenerator !== 'undefined') {
+      var svgQR = QRCodeGenerator.generateSVG(plat.url, {
+        size: 160,
+        margin: 1,
+        colorDark: plat.color || '#00f2ff',
+        colorLight: 'transparent',
+        ecc: 'M'
+      });
+      qrContainer.innerHTML = svgQR;
+    }
+
+    // Update active tab styles for platforms
+    var platformTabs = document.querySelectorAll('#platforms-tabs .tab-btn');
+    platformTabs.forEach(function (btn) {
+      if (btn.classList.contains('tab-' + plat.id)) {
+        btn.classList.add('active');
       } else {
-        dot.classList.remove('active');
+        btn.classList.remove('active');
       }
     });
-    this.showToast('Platform filter: ' + (PLATFORMS[platformKey] ? PLATFORMS[platformKey].name : 'All Multistream'));
   };
 
   ScriberWidget.prototype.updateGoalHUD = function () {
@@ -389,17 +428,41 @@
 
   ScriberWidget.prototype.toggleCard = function (forceState) {
     var card = document.getElementById('tse-card-mode');
+    var platformsCard = document.getElementById('tse-platforms-mode');
     var pill = document.getElementById('tse-pill-mode');
     if (!card) return;
 
     this.isCardOpen = (forceState !== undefined) ? forceState : !this.isCardOpen;
 
     if (this.isCardOpen) {
+      if (this.isPlatformsCardOpen) {
+        this.togglePlatformsCard(false);
+      }
       card.classList.remove('hidden');
       if (this.options.mode === 'compact' && pill) pill.classList.add('hidden');
     } else {
       card.classList.add('hidden');
-      if (this.options.mode === 'compact' && pill) pill.classList.remove('hidden');
+      if (this.options.mode === 'compact' && pill && !this.isPlatformsCardOpen) pill.classList.remove('hidden');
+    }
+  };
+
+  ScriberWidget.prototype.togglePlatformsCard = function (forceState) {
+    var card = document.getElementById('tse-platforms-mode');
+    var donateCard = document.getElementById('tse-card-mode');
+    var pill = document.getElementById('tse-pill-mode');
+    if (!card) return;
+
+    this.isPlatformsCardOpen = (forceState !== undefined) ? forceState : !this.isPlatformsCardOpen;
+
+    if (this.isPlatformsCardOpen) {
+      if (this.isCardOpen) {
+        this.toggleCard(false);
+      }
+      card.classList.remove('hidden');
+      if (this.options.mode === 'compact' && pill) pill.classList.add('hidden');
+    } else {
+      card.classList.add('hidden');
+      if (this.options.mode === 'compact' && pill && !this.isCardOpen) pill.classList.remove('hidden');
     }
   };
 
@@ -465,6 +528,23 @@
     }
   };
 
+  ScriberWidget.prototype.copyPlatformLink = function () {
+    var platKey = this.options.activePlatform;
+    if (!PLATFORMS[platKey]) platKey = 'twitch';
+    var plat = PLATFORMS[platKey];
+    if (!plat) return;
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(plat.url).then(function () {
+        this.showToast('Copied ' + plat.name + ' URL to clipboard! ✨');
+      }.bind(this)).catch(function () {
+        this.fallbackCopy(plat.url);
+      }.bind(this));
+    } else {
+      this.fallbackCopy(plat.url);
+    }
+  };
+
   ScriberWidget.prototype.fallbackCopy = function (text) {
     var textArea = document.createElement('textarea');
     textArea.value = text;
@@ -494,7 +574,25 @@
   ScriberWidget.prototype.attachEvents = function () {
     var self = this;
 
-    // Pill click triggers QR Card popup
+    // Donate button click triggers Donate Card popup
+    var pillActionBtn = document.getElementById('pill-action-btn');
+    if (pillActionBtn) {
+      pillActionBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.toggleCard(true);
+      });
+    }
+
+    // Platforms button click triggers Platforms Card popup
+    var pillPlatformsBtn = document.getElementById('pill-platforms-btn');
+    if (pillPlatformsBtn) {
+      pillPlatformsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.togglePlatformsCard(true);
+      });
+    }
+
+    // Pill click triggers Donate Card popup
     var pill = document.getElementById('tse-pill-mode');
     if (pill) {
       pill.addEventListener('click', function () {
@@ -502,7 +600,15 @@
       });
     }
 
-    // Close QR Card
+    // Minimized view Landing Page button click
+    var pillLandingBtn = document.getElementById('pill-landing-btn');
+    if (pillLandingBtn) {
+      pillLandingBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
+
+    // Close Donate QR Card
     var closeCardBtn = document.getElementById('close-card-btn');
     if (closeCardBtn) {
       closeCardBtn.addEventListener('click', function (e) {
@@ -511,12 +617,30 @@
       });
     }
 
-    // QR Handle badge copy
+    // Close Platforms QR Card
+    var closePlatformsBtn = document.getElementById('close-platforms-btn');
+    if (closePlatformsBtn) {
+      closePlatformsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.togglePlatformsCard(false);
+      });
+    }
+
+    // Donate QR Handle badge copy
     var qrHandleBadge = document.getElementById('qr-handle-display');
     if (qrHandleBadge) {
       qrHandleBadge.addEventListener('click', function (e) {
         e.stopPropagation();
         self.copyCurrentLink();
+      });
+    }
+
+    // Platforms QR Handle badge copy
+    var platformQrHandleBadge = document.getElementById('platform-qr-handle-display');
+    if (platformQrHandleBadge) {
+      platformQrHandleBadge.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.copyPlatformLink();
       });
     }
 
