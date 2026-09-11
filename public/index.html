@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Scriber Experience - Universal OBS Donate Widget</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./assets/images/favicon.png"/>
+  <link rel="shortcut icon" type="image/png" href="./assets/images/favicon.png"/>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Eagle+Lake&family=MedievalSharp&family=Philosopher&family=UnifrakturMaguntia&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Widget Stylesheet -->
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <!-- Confetti Particle Canvas for Cheers & Celebrations -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Live Donation / Cheer Alert Popup Overlay -->
+  <div id="cheer-alert-overlay" class="alert-overlay">
+    <div class="alert-box glass-panel glow-border">
+      <div class="alert-icon">⚡</div>
+      <div class="alert-content">
+        <div class="alert-title">✨ NEW STREAM CHEER! ✨</div>
+        <div class="alert-message">
+          <span id="alert-donor-name" class="donor-name">Scriber Champion</span> sent <span id="alert-amount-display" class="alert-amount">$10.00</span>
+        </div>
+        <div id="alert-msg-display" style="font-size:11px;color:#94a3b8;font-style:italic;">Keep creating awesome content! ✨</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Feedback -->
+  <div id="tse-toast-notification" class="tse-toast">Link copied!</div>
+
+  <!-- Main OBS Widget Viewport Container -->
+  <div id="scriber-widget-container" class="tse-widget-root align-top-left">
+
+    <!-- ====================================================
+         VIEW 1: COMPACT PILL / ON-STREAM INTERACTIVE BUTTON
+         ==================================================== -->
+    <div id="tse-pill-mode" class="glass-panel glow-border widget-compact-pill" title="Click to view QR & Donation Links">
+      <img src="./assets/images/logo.png" alt="TSE Logo" class="brand-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
+      
+      <div class="pill-info">
+        <div class="pill-title eigenscribe-gradient-text">
+          <span>The Scriber Experience</span>
+        </div>
+        <div class="pill-subtitle">
+          <span>Support via:</span>
+          <span id="pill-target-name" class="pill-active-target">Cash App ($renzoscriber)</span>
+        </div>
+      </div>
+
+      <!-- Multistream Live Platform Status Dots -->
+      <div id="multistream-cluster" class="multistream-cluster" title="Multistream active channels">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <button id="pill-action-btn" class="btn-hover color-5 pill-action-btn">
+        <span id="pill-action-emoji" class="emoji">💸</span>
+        <span id="pill-action-label">Donate</span>
+      </button>
+    </div>
+
+    <!-- ====================================================
+         VIEW 2: EXPANDED QR CODE DONATE CARD
+         ==================================================== -->
+    <div id="tse-card-mode" class="glass-panel glow-border widget-qr-card hidden">
+      <div class="qr-card-header">
+        <div class="qr-card-brand">
+          <img src="./assets/images/logo.png" alt="TSE Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
+          <div>
+            <div class="qr-card-title eigenscribe-gradient-text">The Scriber Experience</div>
+            <div class="qr-card-subtitle">Scan to tip or support the stream</div>
+          </div>
+        </div>
+        <button id="close-card-btn" class="close-btn" title="Close">✕</button>
+      </div>
+
+      <!-- Donation Platform Tabs (Cash App, BMAC, Amazon, TSE) -->
+      <div id="donation-tabs" class="donation-method-tabs">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- QR Code Display Box with Auto Generated Crisp SVG -->
+      <div id="qr-code-box" class="qr-container">
+        <!-- Dynamic QR SVG Injected Here -->
+      </div>
+
+      <div class="qr-scan-hint">
+        <span>📱 Scan with camera to open</span>
+        <span id="qr-method-name" class="neon-cyan-text">Cash App</span>
+      </div>
+
+      <div id="qr-handle-display" class="qr-handle-badge" title="Click to copy link">
+        💸 $renzoscriber <span style="opacity:0.6;font-size:9px">📋 copy</span>
+      </div>
+
+      <!-- Direct Link Buttons Row for Easy Access -->
+      <div class="card-links-section">
+        <div class="links-subheading">Donation & Support Links</div>
+        <div class="card-link-buttons">
+          <a href="https://cash.app/$renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-5 card-btn"><span class="emoji">💸</span> Cash App</a>
+          <a href="https://www.buymeacoffee.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-2 card-btn"><span class="emoji">☕</span> Buy Me a Coffee</a>
+          <a href="https://www.amazon.com/hz/wishlist/ls/4YHE4NZD3W98?ref_=wl_share" target="_blank" rel="noopener noreferrer" class="btn-hover color-4 card-btn"><span class="emoji">📦</span> Wishlist</a>
+          <a href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 card-btn"><span class="emoji">🌊</span> TSE Portal</a>
+        </div>
+
+        <div class="links-subheading" style="margin-top: 4px;">Multistream Channels</div>
+        <div class="card-link-buttons">
+          <a href="https://www.twitch.tv/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 card-btn"><span class="emoji">😈</span> Twitch</a>
+          <a href="https://velora.tv/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 card-btn"><span class="emoji">✨</span> Velora</a>
+          <a href="https://www.youtube.com/@sofiascriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 card-btn"><span class="emoji">❤️</span> YouTube</a>
+          <a href="https://www.kick.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 card-btn"><span class="emoji">🤢</span> Kick</a>
+          <a href="https://beamstream.gg/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-8 card-btn"><span class="emoji">💠</span> BEAM</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         VIEW 3: STREAM DONATION GOAL HUD
+         ==================================================== -->
+    <div id="tse-goal-mode" class="glass-panel glow-border widget-goal-card hidden">
+      <div class="goal-header">
+        <div class="goal-title">
+          <span class="emoji">🎯</span>
+          <span id="goal-title-text" class="eigenscribe-gradient-text">Stream Upgrade Goal</span>
+        </div>
+        <div class="goal-stats">
+          <span id="goal-current-amount">$45</span> / <span id="goal-target-amount">$100 (45%)</span>
+        </div>
+      </div>
+
+      <div class="goal-progress-track">
+        <div id="goal-bar-fill" class="goal-progress-bar" style="width: 45%;"></div>
+      </div>
+
+      <div class="goal-footer">
+        <div class="recent-donor-badge">
+          <span>💖 Top Scriber:</span>
+          <span class="donor-name">Katnip the Brave</span>
+        </div>
+        <div>
+          <span class="emoji">💸</span> <span class="neon-cyan-text">$renzoscriber</span>
+        </div>
+      </div>
+
+      <div class="goal-link-buttons">
+        <a href="https://cash.app/$renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-5 goal-btn"><span class="emoji">💸</span> Cash App</a>
+        <a href="https://www.buymeacoffee.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-2 goal-btn"><span class="emoji">☕</span> Buy Me a Coffee</a>
+        <a href="https://www.amazon.com/hz/wishlist/ls/4YHE4NZD3W98?ref_=wl_share" target="_blank" rel="noopener noreferrer" class="btn-hover color-4 goal-btn"><span class="emoji">📦</span> Wishlist</a>
+        <button class="btn-hover color-9 goal-btn" onclick="window.ScriberWidgetInstance.toggleCard(true)"><span class="emoji">📱</span> QR Code</button>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         VIEW 4: STREAM OVERLAY MARQUEE TICKER (Wide Bar)
+         ==================================================== -->
+    <div id="tse-ticker-mode" class="glass-panel glow-border widget-ticker-bar hidden">
+      <div class="ticker-left">
+        <img src="./assets/images/logo.png" style="width:28px;height:28px;border-radius:50%;" alt="logo" onerror="this.style.display='none'">
+        <span class="eigenscribe-gradient-text" style="font-size:12px;font-weight:bold;">The Scriber Experience</span>
+      </div>
+
+      <div class="ticker-marquee-box">
+        <div class="ticker-marquee-content">
+          <div class="ticker-item">
+            <span class="emoji">⚡</span> <span>Multistreaming Live on Twitch, Velora, YouTube, Kick & BEAM!</span>
+          </div>
+          <div id="ticker-active-target" class="ticker-item">
+            <span class="emoji">💸</span> <span class="neon-cyan-text">Cash App:</span> $renzoscriber
+          </div>
+          <div class="ticker-item">
+            <span class="emoji">☕</span> <span class="neon-cyan-text">Buy Me a Coffee:</span> buymeacoffee.com/renzoscriber
+          </div>
+          <div class="ticker-item">
+            <span class="emoji">📦</span> <span class="neon-cyan-text">Amazon Wishlist:</span> bit.ly/tse-wishlist
+          </div>
+          <div class="ticker-item">
+            <span class="emoji">👑</span> <span>Special thanks to our OG Scribers & Associate Producers!</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0;">
+        <button class="btn-hover color-9" style="height:26px;font-size:10px;padding:0 10px;" onclick="window.ScriberWidgetInstance.toggleCard(true)">
+          Scan QR 📱
+        </button>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         VIEW 5: INTERACTIVE OBS DOCK / CONTROL PANEL
+         ==================================================== -->
+    <div id="tse-dock-mode" class="glass-panel glow-border tse-dock-panel hidden">
+      <div class="dock-header">
+        <div class="dock-title eigenscribe-gradient-text">
+          <span>⚡ TSE Widget Control Dock</span>
+        </div>
+        <span style="font-size:10px;color:#94a3b8;">OBS Studio Multi-Stream Hub</span>
+      </div>
+
+      <div class="dock-grid">
+        <!-- Card 1: Quick Mode Selector -->
+        <div class="dock-card">
+          <div class="dock-card-title">
+            <span>Overlay Layout</span>
+            <span>🖥️</span>
+          </div>
+          <select id="dock-mode-select" class="control-input" style="width:100%;">
+            <option value="compact">Compact Pill (Default)</option>
+            <option value="card">On-Stream QR Card</option>
+            <option value="goal">Goal Progress Bar</option>
+            <option value="ticker">Full Bottom Ticker</option>
+            <option value="dock">Control Dock</option>
+          </select>
+        </div>
+
+        <!-- Card 2: Interactive Alert Simulator -->
+        <div class="dock-card">
+          <div class="dock-card-title">
+            <span>Test Alerts</span>
+            <span>🎉</span>
+          </div>
+          <button id="btn-test-cheer" class="btn-hover color-4 quick-action-btn">
+            Test $10 Cheer Alert 🚀
+          </button>
+        </div>
+
+        <!-- Card 3: Goal Settings -->
+        <div class="dock-card">
+          <div class="dock-card-title">
+            <span>Goal Target ($)</span>
+            <span>🎯</span>
+          </div>
+          <input id="dock-goal-target" type="number" class="control-input" style="width:100%;" value="100">
+        </div>
+
+        <!-- Card 4: Current Goal Amount -->
+        <div class="dock-card">
+          <div class="dock-card-title">
+            <span>Current Raised ($)</span>
+            <span>💰</span>
+          </div>
+          <input id="dock-goal-current" type="number" class="control-input" style="width:100%;" value="45">
+        </div>
+      </div>
+
+      <!-- Quick Platform Link Launchers -->
+      <div style="font-size:11.5px;color:#cbd5e1;font-weight:700;margin-top:4px;">📡 Multistream Channels</div>
+      <div class="dock-links-grid">
+        <a href="https://www.twitch.tv/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 dock-channel-btn"><span class="emoji">😈</span> Twitch</a>
+        <a href="https://velora.tv/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 dock-channel-btn"><span class="emoji">✨</span> Velora</a>
+        <a href="https://www.youtube.com/@sofiascriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 dock-channel-btn"><span class="emoji">❤️</span> YouTube</a>
+        <a href="https://www.kick.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 dock-channel-btn"><span class="emoji">🤢</span> Kick</a>
+        <a href="https://beamstream.gg/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-8 dock-channel-btn"><span class="emoji">💠</span> BEAM</a>
+      </div>
+
+      <div style="font-size:11.5px;color:#cbd5e1;font-weight:700;margin-top:4px;">💛 Donation & Support Targets</div>
+      <div class="dock-links-grid">
+        <a href="https://cash.app/$renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-5 dock-channel-btn"><span class="emoji">💸</span> Cash App</a>
+        <a href="https://www.buymeacoffee.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-2 dock-channel-btn"><span class="emoji">☕</span> Buy Me a Coffee</a>
+        <a href="https://www.amazon.com/hz/wishlist/ls/4YHE4NZD3W98?ref_=wl_share" target="_blank" rel="noopener noreferrer" class="btn-hover color-4 dock-channel-btn"><span class="emoji">📦</span> Amazon Wishlist</a>
+        <a href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 dock-channel-btn"><span class="emoji">🌊</span> TSE Portal</a>
+      </div>
+
+      <div style="font-size:10px;color:#94a3b8;text-align:center;">
+        eigenscribe © 2025-2026 • The Scriber Experience
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Load Scripts -->
+  <script src="./qr-generator.js"></script>
+  <script src="./confetti.js"></script>
+  <script src="./widget.js"></script>
+
+  <script>
+    // Initialize Widget Instance
+    document.addEventListener('DOMContentLoaded', function() {
+      window.ScriberWidgetInstance = new ScriberWidget.ScriberWidget();
+      window.ScriberWidgetInstance.init();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "scriber-donate-widget",
+  "version": "1.0.0",
+  "description": "Universal Interactive OBS Donate Widget for The Scriber Experience with multistream support",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "obs",
+    "widget",
+    "multistream",
+    "twitch",
+    "youtube",
+    "kick",
+    "velora",
+    "beam",
+    "cashapp",
+    "buymeacoffee",
+    "the-scriber-experience"
+  ],
+  "author": "The Scriber Experience",
+  "license": "MIT",
+  "private": true
+}
