@@ -20,7 +20,7 @@ An interactive, multistream-compatible on-stream donation widget and OBS dock cu
 - 📱 **Dynamic Crisp QR Code Generator**: Renders glowing SVG QR codes directly in OBS for mobile viewers scanning TV/PC screens (zero external network dependencies).
 - 🎮 **OBS Interactive Browser Source Ready**: Supports OBS Studio's right-click **Interact** mode to click buttons, switch tabs, toggle QR overlays, and copy URLs with feedback toasts.
 - 🎯 **Stream Donation Goal Tracker**: Animated glowing goal progress bar with real-time target adjustments and top donor highlights.
-- 🔊 **Built-in Web Audio Alert Synthesizer**: Retro/cyber coin and cheer sound synthesis via Web Audio API (no missing audio assets).
+- 🔊 **Built-in Web Audio Alert Synthesizer**: Retro/cyber cheer sound synthesis via Web Audio API (no missing audio assets).
 - 🎉 **Particle Confetti Celebrations**: Full-screen cyber particle bursts on cheers/donations.
 - 🔄 **5 Overlay Layout Modes**: Compact Pill, QR Card, Goal HUD, Marquee Ticker, and Interactive Control Dock.
 - 🚀 **Live Webhook & Chat Bot Integration**: Local Server-Sent Events (SSE) and `/api/cheer` REST endpoints to trigger on-screen alerts from chat bots (`!donate` command) or payment webhooks.
@@ -86,7 +86,7 @@ Customize the overlay directly via the Browser Source URL:
 | `current` | Number (e.g. `45`, `80`) | `45` | Currently raised donation amount in $ |
 | `title` | Text (URL encoded) | `Stream Upgrade Goal` | Goal title text |
 | `sound` | `true`, `false` | `true` | Enable/disable audio chimes |
-| `autoRotate` | `true`, `false` | `true` | Automatically cycle donation targets |
+| `autoRotate` | `true`, `false` | `false` | Automatically cycle donation targets |
 | `interval` | Number (in seconds) | `12` | Rotation interval between methods |
 | `testMode` | `true`, `false` | `false` | Shows background for standalone preview |
 

@@ -129,7 +129,7 @@
       scale: 1,
       align: 'top-left',
       soundEnabled: true,
-      autoRotate: true,
+      autoRotate: false,
       rotateInterval: 12000,
       goalCurrent: 45,
       goalTarget: 100,
@@ -160,7 +160,7 @@
     if (params.has('scale')) this.options.scale = parseFloat(params.get('scale')) || 1;
     if (params.has('align')) this.options.align = params.get('align');
     if (params.has('sound')) this.options.soundEnabled = params.get('sound') !== 'false';
-    if (params.has('autoRotate')) this.options.autoRotate = params.get('autoRotate') !== 'false';
+    if (params.has('autoRotate')) this.options.autoRotate = params.get('autoRotate') === 'true';
     if (params.has('interval')) this.options.rotateInterval = (parseInt(params.get('interval'), 10) || 12) * 1000;
     if (params.has('goal')) this.options.goalTarget = parseFloat(params.get('goal')) || 100;
     if (params.has('current')) this.options.goalCurrent = parseFloat(params.get('current')) || 45;
@@ -335,9 +335,6 @@
     this.options.activeTarget = targetKey;
     this.currentTargetIndex = this.targetsList.indexOf(targetKey);
     this.renderActiveTarget();
-    if (this.options.soundEnabled) {
-      AudioSynth.playChime('coin');
-    }
   };
 
   ScriberWidget.prototype.setPlatform = function (platformKey) {
@@ -400,7 +397,6 @@
     if (this.isCardOpen) {
       card.classList.remove('hidden');
       if (this.options.mode === 'compact' && pill) pill.classList.add('hidden');
-      if (this.options.soundEnabled) AudioSynth.playChime('coin');
     } else {
       card.classList.add('hidden');
       if (this.options.mode === 'compact' && pill) pill.classList.remove('hidden');

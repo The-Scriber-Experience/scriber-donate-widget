@@ -75,6 +75,8 @@ test('ScriberWidget logic & state math', async (t) => {
     assert.strictEqual(widget.options.goalCurrent, 50);
     assert.strictEqual(widget.options.goalTarget, 200);
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
+    assert.strictEqual(widget.options.autoRotate, false);
+    assert.strictEqual(widget.rotateTimer, null);
   });
 
   await t.test('cycles targets sequentially on nextTarget()', () => {
