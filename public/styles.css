@@ -51,12 +51,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #0d1117;
-  background-image: radial-gradient(circle at 50% 20%, rgba(20, 181, 255, 0.15) 0%, rgba(13, 17, 23, 0.95) 100%), url('./assets/images/spacebackground.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background: transparent;
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
