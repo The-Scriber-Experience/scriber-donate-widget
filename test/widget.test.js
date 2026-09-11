@@ -139,6 +139,8 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(html.includes('id="tse-card-mode"'), 'Contains card mode element');
     assert.ok(html.includes('id="tse-platforms-mode"'), 'Contains platforms card mode element');
     assert.ok(html.includes('id="pill-platforms-btn"'), 'Contains dedicated platforms button in minimized view');
+    assert.ok(html.includes('class="pill-buttons-row"'), 'Contains button row in minimized view under title');
+    assert.ok(html.includes('id="pill-action-btn" class="btn-hover color-9 pill-action-btn"'), 'Donate button is blue color-9');
     assert.ok(html.includes('src="./assets/images/favicon.png"'), 'Favicon image is used in index.html');
     assert.ok(html.includes('class="btn-favicon-emoji emoji"'), 'Favicon image is used as the emoji at the beginning of the button text');
     assert.ok(html.includes('Platforms</span>'), 'Button text includes Platforms');
@@ -159,6 +161,7 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(css.includes('spacebackground.jpg') || css.includes('spacebackground.png'), 'Contains space background reference');
     assert.ok(css.includes('min-width: 580px'), 'Contains wider compact pill dimensions');
     assert.ok(css.includes('width: 480px'), 'Contains wider QR card dimensions');
+    assert.ok(css.includes('.pill-buttons-row'), 'Contains pill buttons row styles');
     assert.ok(css.includes('.btn-favicon-emoji'), 'Contains btn-favicon-emoji style');
     assert.ok(css.includes('.tab-twitch.active'), 'Contains platform tab active gradient style');
   });

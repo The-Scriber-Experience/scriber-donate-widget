@@ -294,7 +294,7 @@
 
     if (pillActiveText) pillActiveText.textContent = target.name + ' (' + target.handle + ')';
     if (pillActionBtn) {
-      pillActionBtn.className = 'btn-hover ' + target.colorClass + ' pill-action-btn';
+      pillActionBtn.className = 'btn-hover color-9 pill-action-btn';
     }
     if (pillActionEmoji) pillActionEmoji.textContent = target.icon;
     if (pillActionLabel) pillActionLabel.textContent = 'Donate';

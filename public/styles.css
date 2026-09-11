@@ -62,7 +62,7 @@ body.transparent-bg {
 }
 
 body.test-mode {
-  background: #090d13 radial-gradient(circle at 50% 20%, rgba(20, 181, 255, 0.15) 0%, rgba(13, 17, 23, 0.95) 100%), url('./assets/images/spacebackground.jpg') center/cover no-repeat fixed;
+  background: #090d13 radial-gradient(circle at 50% 20%, rgba(20, 181, 255, 0.15) 0%, rgba(13, 17, 23, 0.95) 100%), url('./assets/images/spacebackground.png') center/cover no-repeat fixed;
   overflow-y: auto;
 }
 
@@ -116,7 +116,7 @@ body.test-mode {
 /* Glass Panel Component with Opaque Space Background */
 .glass-panel {
   background-color: #0d1117;
-  background-image: linear-gradient(135deg, rgba(13, 17, 23, 0.94), rgba(22, 27, 34, 0.96)), url('./assets/images/spacebackground.jpg');
+  background-image: linear-gradient(135deg, rgba(13, 17, 23, 0.7), rgba(22, 27, 34, 0.8)), url('./assets/images/spacebackground.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -299,7 +299,7 @@ body.test-mode {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
+  gap: 8px;
   min-width: 160px;
   flex-shrink: 0;
 }
@@ -312,6 +312,13 @@ body.test-mode {
   gap: 6px;
   letter-spacing: 0.3px;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.pill-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* Multistream Platforms Badge Cluster */
@@ -390,10 +397,6 @@ body.test-mode {
   vertical-align: middle;
   border-radius: 3px;
   display: inline-block;
-}
-
-#pill-action-btn {
-  margin-left: auto;
 }
 
 .pill-landing-btn {
