@@ -22,7 +22,7 @@ An interactive, multistream-compatible on-stream donation widget and OBS dock cu
 - 🎯 **Stream Donation Goal Tracker**: Animated glowing goal progress bar with real-time target adjustments and top donor highlights.
 - 🔊 **Built-in Web Audio Alert Synthesizer**: Retro/cyber cheer sound synthesis via Web Audio API (no missing audio assets).
 - 🎉 **Particle Confetti Celebrations**: Full-screen cyber particle bursts on cheers/donations.
-- 🔄 **5 Overlay Layout Modes**: Compact Pill, QR Card, Goal HUD, Marquee Ticker, and Interactive Control Dock.
+- 🔄 **4 Overlay Layout Modes**: QR Card, Goal HUD, Marquee Ticker, and Interactive Control Dock.
 - 🚀 **Live Webhook & Chat Bot Integration**: Local Server-Sent Events (SSE) and `/api/cheer` REST endpoints to trigger on-screen alerts from chat bots (`!donate` command) or payment webhooks.
 
 ---
@@ -77,7 +77,7 @@ Customize the overlay directly via the Browser Source URL:
 
 | Parameter | Values | Default | Description |
 |---|---|---|---|
-| `mode` | `compact`, `card`, `goal`, `ticker`, `dock` | `compact` | Layout mode for overlay or dock |
+| `mode` | `card`, `platforms`, `links`, `goal`, `ticker`, `dock` | `card` | Layout mode for overlay or dock |
 | `target` | `cashapp`, `bmac`, `amazon`, `landing` | `cashapp` | Initial active donation method |
 | `platform`| `all`, `twitch`, `velora`, `youtube`, `kick`, `beam` | `all` | Highlighted multistream platform |
 | `scale` | `0.8`, `1.0`, `1.2`, `1.5`, etc. | `1` | Widget display scale |
@@ -91,8 +91,6 @@ Customize the overlay directly via the Browser Source URL:
 | `testMode` | `true`, `false` | `false` | Shows background for standalone preview |
 
 ### Example Preset URLs for OBS:
-- **Compact Floating Pill (Top-Right)**:
-  `http://localhost:3000/?mode=compact&align=top-right&scale=1.1`
 - **On-Screen Glowing QR Card (Bottom-Right)**:
   `http://localhost:3000/?mode=card&align=bottom-right`
 - **Goal Progress HUD (Bottom-Left)**:

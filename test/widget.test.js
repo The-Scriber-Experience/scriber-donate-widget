@@ -79,15 +79,11 @@ test('Multistream Platforms & Targets configuration integrity', async (t) => {
 
 test('ScriberWidget logic & state math', async (t) => {
   await t.test('initializes default options correctly', () => {
-    const widget = new ScriberWidget({
-      mode: 'compact',
-      goalCurrent: 50,
-      goalTarget: 200
-    });
+    const widget = new ScriberWidget();
 
-    assert.strictEqual(widget.options.mode, 'compact');
-    assert.strictEqual(widget.options.goalCurrent, 50);
-    assert.strictEqual(widget.options.goalTarget, 200);
+    assert.strictEqual(widget.options.mode, 'card');
+    assert.strictEqual(widget.options.goalCurrent, 45);
+    assert.strictEqual(widget.options.goalTarget, 100);
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
     assert.strictEqual(widget.options.activePlatform, 'twitch');
     assert.strictEqual(widget.options.activeLink, 'landing');
@@ -162,13 +158,10 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.strictEqual(res.status, 200);
     const html = await res.text();
     assert.ok(html.includes('The Scriber Experience'), 'Serves index.html correctly');
-    assert.ok(html.includes('id="tse-pill-mode"'), 'Contains pill mode element');
+    assert.ok(!html.includes('id="tse-pill-mode"'), 'Removed minimized view / pill mode element');
     assert.ok(html.includes('id="tse-card-mode"'), 'Contains card mode element');
     assert.ok(html.includes('id="tse-platforms-mode"'), 'Contains platforms card mode element');
     assert.ok(html.includes('id="tse-links-mode"'), 'Contains links card mode element');
-    assert.ok(html.includes('id="pill-platforms-btn"'), 'Contains dedicated platforms button in minimized view');
-    assert.ok(html.includes('class="pill-buttons-row"'), 'Contains button row in minimized view under title');
-    assert.ok(html.includes('id="pill-action-btn" class="btn-hover color-9 pill-action-btn"'), 'Donate button is blue color-9');
     assert.ok(html.includes('src="../assets/images/favicon.png"'), 'Favicon image is used in index.html');
     assert.ok(html.includes('class="btn-favicon-emoji emoji"'), 'Favicon image is used as the emoji at the beginning of the button text');
     assert.ok(html.includes('Platforms</span>'), 'Button text includes Platforms');
@@ -177,9 +170,16 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(html.includes('id="links-tabs"'), 'Contains links tabs container');
     assert.ok(html.includes('id="links-qr-code-box"'), 'Contains links QR code box');
     assert.ok(!html.includes('id="multistream-cluster"'), 'Replaced old multistream cluster row with platforms button');
-    assert.ok(html.includes('id="pill-landing-btn"'), 'Contains dedicated landing/links button in minimized view');
     assert.ok(html.includes('TSE Links'), 'Contains TSE Links name');
     assert.ok(!html.includes('TSE All Links'), 'Does not contain TSE All Links');
+    assert.ok(html.includes('<div class="qr-card-title eigenscribe-gradient-text">The Scriber Experience</div>'), 'Maximized window title is The Scriber Experience');
+    assert.ok(html.includes('<div class="qr-card-subtitle">Donations</div>'), 'Donations maximized window subtitle describes donations tab');
+    assert.ok(html.includes('<div class="qr-card-subtitle">Platforms</div>'), 'Platforms maximized window subtitle describes platforms tab');
+    assert.ok(html.includes('<div class="qr-card-subtitle">TSE Links</div>'), 'TSE Links maximized window subtitle describes links tab');
+    assert.ok(html.includes('class="window-nav-tabs"'), 'Contains window navigation tabs in maximized windows');
+    assert.ok(html.includes('data-window="card"'), 'Contains card window tab target');
+    assert.ok(html.includes('data-window="platforms"'), 'Contains platforms window tab target');
+    assert.ok(html.includes('data-window="links"'), 'Contains links window tab target');
 
     // Request /html/index.html
     const htmlSubRes = await fetch(`http://localhost:${TEST_PORT}/html/index.html`);
@@ -201,6 +201,8 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(css.includes('.tab-landing.active'), 'Contains landing tab active gradient style');
     assert.ok(css.includes('.tab-zettelkasten.active'), 'Contains zettelkasten tab active gradient style');
     assert.ok(css.includes('.tab-research.active'), 'Contains research tab active gradient style');
+    assert.ok(css.includes('.window-nav-tabs'), 'Contains window navigation tabs style');
+    assert.ok(css.includes('.window-tab-btn'), 'Contains window tab button style');
 
     // Fallback request /styles.css
     const fallbackCssRes = await fetch(`http://localhost:${TEST_PORT}/styles.css`);
