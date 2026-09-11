@@ -12,7 +12,7 @@
   --color-link-hover: #C5F8FF;
 
   /* TSE Gradients */
-  --gradient-brand: linear-gradient(135deg, #00f2ff, #3b82f6, #8b5cf6, #ec4899);
+  --gradient-brand: linear-gradient(135deg, #00f2fe, #2563eb, #8b5cf6, #ec4899);
   --gradient-neon: linear-gradient(135deg, #00FFEE, #27AAFF);
   --gradient-cyber: linear-gradient(to right bottom, #00C8FF, #14A5FF, #7066FF, #5E17EB);
   --gradient-gold: linear-gradient(135deg, #FFD700, #FFA500, #FF6347);
@@ -62,7 +62,7 @@ body.transparent-bg {
 }
 
 body.test-mode {
-  background: #090d13 radial-gradient(circle at 50% 20%, rgba(20, 181, 255, 0.15) 0%, rgba(13, 17, 23, 0.95) 100%), url('./assets/images/spacebackground.png') center/cover no-repeat fixed;
+  background: #090d13 radial-gradient(circle at 50% 20%, rgba(20, 181, 255, 0.15) 0%, rgba(13, 17, 23, 0.95) 100%), url('../assets/images/spacebackground.png') center/cover no-repeat fixed;
   overflow-y: auto;
 }
 
@@ -116,7 +116,7 @@ body.test-mode {
 /* Glass Panel Component with Opaque Space Background */
 .glass-panel {
   background-color: #0d1117;
-  background-image: linear-gradient(135deg, rgba(13, 17, 23, 0.7), rgba(22, 27, 34, 0.8)), url('./assets/images/spacebackground.png');
+  background-image: linear-gradient(135deg, rgba(13, 17, 23, 0.7), rgba(22, 27, 34, 0.8)), url('../assets/images/spacebackground.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -180,6 +180,7 @@ body.test-mode {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;
+  filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.5)) brightness(1.25);
 }
 
 .neon-cyan-text {
@@ -223,40 +224,40 @@ body.test-mode {
 }
 
 .btn-hover.color-1 {
-  background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
-  box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.6);
+  background-image: linear-gradient(to right, #00b4d8, #00f2fe, #10b981, #059669);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-2 {
-  background-image: linear-gradient(to right, #f5ce62, #e43603, #fa7199, #e85a19);
-  box-shadow: 0 4px 15px 0 rgba(229, 66, 10, 0.6);
+  background-image: linear-gradient(to right, #f59e0b, #ea580c, #f43f5e, #e11d48);
+  box-shadow: 0 0 12px rgba(234, 88, 12, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-3 {
-  background-image: linear-gradient(to right, #667eea, #764ba2, #6B8DD6, #8E37D7);
-  box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.6);
+  background-image: linear-gradient(to right, #4f46e5, #7c3aed, #6366f1, #9333ea);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-4 {
-  background-image: linear-gradient(to right, #fc6076, #ff9a44, #ef9d43, #e75516);
-  box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.6);
+  background-image: linear-gradient(to right, #e11d48, #ea580c, #f97316, #dc2626);
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-5 {
-  background-image: linear-gradient(to right, #0ba360, #3cba92, #30dd8a, #2bb673);
-  box-shadow: 0 4px 15px 0 rgba(23, 168, 108, 0.6);
+  background-image: linear-gradient(to right, #059669, #10b981, #00d632, #059669);
+  box-shadow: 0 0 12px rgba(0, 214, 50, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-6 {
-  background-image: linear-gradient(to right, #009245, #3f86ed, #6253e1, #8E37D7, #fa7199);
-  box-shadow: 0 4px 15px 0 rgba(83, 176, 57, 0.6);
+  background-image: linear-gradient(to right, #059669, #2563eb, #7c3aed, #9333ea, #e11d48);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-7 {
-  background-image: linear-gradient(to right, #6253e1, #852D91, #A3A1FF, #fc6076);
-  box-shadow: 0 4px 15px 0 rgba(126, 52, 161, 0.6);
+  background-image: linear-gradient(to right, #06b6d4, #6366f1, #a855f7, #ec4899);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-8 {
-  background-image: linear-gradient(to right, #29323c, #485563, #2b5876, #4e4376);
-  box-shadow: 0 4px 15px 0 rgba(45, 54, 65, 0.6);
+  background-image: linear-gradient(to right, #1e293b, #334155, #1e3a5f, #312e81);
+  box-shadow: 0 0 12px rgba(51, 65, 85, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 .btn-hover.color-9 {
-  background-image: linear-gradient(to right, #25aae1, #4481eb, #04befe, #3f86ed);
-  box-shadow: 0 4px 15px 0 rgba(65, 132, 234, 0.6);
+  background-image: linear-gradient(to right, #0070f3, #00dfd8, #0070f3, #00b4d8);
+  box-shadow: 0 0 12px rgba(0, 223, 216, 0.45), 0 4px 15px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* =========================================================
@@ -311,7 +312,8 @@ body.test-mode {
   align-items: center;
   gap: 6px;
   letter-spacing: 0.3px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.6), 0 1px 4px rgba(0, 0, 0, 0.8);
+  filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.5)) brightness(1.25);
 }
 
 .pill-buttons-row {
@@ -384,10 +386,20 @@ body.test-mode {
   align-items: center;
   gap: 6px;
   font-size: 11px;
+  font-weight: 700;
   padding: 6px 14px;
   height: 34px;
   flex-shrink: 0;
   text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.35), 0 4px 14px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.2px;
+}
+
+.pill-action-btn:hover {
+  border-color: rgba(0, 242, 255, 0.6);
+  box-shadow: 0 0 16px rgba(0, 242, 255, 0.65), 0 6px 18px rgba(0, 0, 0, 0.5);
 }
 
 .btn-favicon-emoji {
@@ -558,6 +570,24 @@ body.test-mode {
 .tab-btn.tab-beam.active {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+  color: #fff;
+}
+
+.tab-btn.tab-landing.active {
+  background: linear-gradient(135deg, #00f2fe, #0070f3);
+  box-shadow: 0 2px 10px rgba(0, 242, 254, 0.5);
+  color: #fff;
+}
+
+.tab-btn.tab-zettelkasten.active {
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.5);
+  color: #fff;
+}
+
+.tab-btn.tab-research.active {
+  background: linear-gradient(135deg, #06b6d4, #2563eb);
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.5);
   color: #fff;
 }
 

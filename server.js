@@ -7,6 +7,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+const { PLATFORMS, DONATION_TARGETS, TSE_LINKS } = require('./public/js/widget');
+
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
@@ -42,7 +44,7 @@ function broadcastEvent(eventName, data) {
 
 function handleStaticFile(req, res, pathname) {
   let cleanPath = pathname.split('?')[0].replace(/^[\/\\]+/, '');
-  if (!cleanPath) cleanPath = 'index.html';
+  if (!cleanPath || cleanPath === 'index.html') cleanPath = path.join('html', 'index.html');
 
   let filePath = path.resolve(PUBLIC_DIR, cleanPath);
 
@@ -53,6 +55,16 @@ function handleStaticFile(req, res, pathname) {
     return;
   }
 
+  if (!fs.existsSync(filePath)) {
+    if (fs.existsSync(path.join(PUBLIC_DIR, 'html', cleanPath))) {
+      filePath = path.join(PUBLIC_DIR, 'html', cleanPath);
+    } else if (fs.existsSync(path.join(PUBLIC_DIR, 'css', cleanPath))) {
+      filePath = path.join(PUBLIC_DIR, 'css', cleanPath);
+    } else if (fs.existsSync(path.join(PUBLIC_DIR, 'js', cleanPath))) {
+      filePath = path.join(PUBLIC_DIR, 'js', cleanPath);
+    }
+  }
+
   fs.stat(filePath, (err, stats) => {
     if (err) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -61,7 +73,11 @@ function handleStaticFile(req, res, pathname) {
     }
 
     if (stats.isDirectory()) {
-      filePath = path.join(filePath, 'index.html');
+      if (fs.existsSync(path.join(filePath, 'index.html'))) {
+        filePath = path.join(filePath, 'index.html');
+      } else if (fs.existsSync(path.join(filePath, 'html', 'index.html'))) {
+        filePath = path.join(filePath, 'html', 'index.html');
+      }
     }
 
     const ext = path.extname(filePath).toLowerCase();
@@ -178,4 +194,4 @@ if (require.main === module) {
   startServer();
 }
 
-module.exports = { server, startServer, broadcastEvent, sseClients };
+module.exports = { server, startServer, broadcastEvent, sseClients, PLATFORMS, DONATION_TARGETS, TSE_LINKS };

@@ -127,11 +127,14 @@ scriber-donate-widget/
 ├── public/
 │   ├── assets/
 │   │   └── images/          # TSE logos, avatars & background
-│   ├── index.html           # Main OBS widget & layout modes
-│   ├── styles.css           # Glassmorphism, animations & TSE branding
-│   ├── widget.js            # Controller, state machine & Web Audio synth
-│   ├── qr-generator.js      # Zero-dependency SVG QR code generator
-│   └── confetti.js          # Particle cheer explosion engine
+│   ├── css/
+│   │   └── styles.css       # Glassmorphism, animations & TSE branding
+│   ├── html/
+│   │   └── index.html       # Main OBS widget & layout modes
+│   └── js/
+│       ├── confetti.js      # Particle cheer explosion engine
+│       ├── qr-generator.js  # Zero-dependency SVG QR code generator
+│       └── widget.js        # Controller, state machine & Web Audio synth
 ├── test/
 │   └── widget.test.js       # Automated test suite
 ├── server.js                # Static file server & SSE / REST alert bridge

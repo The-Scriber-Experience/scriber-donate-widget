@@ -65,6 +65,40 @@
     }
   };
 
+  // TSE Links & Research Registry
+  var TSE_LINKS = {
+    landing: {
+      id: 'landing',
+      name: 'TSE Landing Page',
+      icon: '🌊',
+      handle: 'the-scriber-experience.github.io',
+      url: 'https://the-scriber-experience.github.io/tse-landing-page/',
+      color: '#00f2fe',
+      colorClass: 'color-9',
+      badgeText: 'TSE Landing Page'
+    },
+    zettelkasten: {
+      id: 'zettelkasten',
+      name: 'Zettelkasten',
+      icon: '🔮',
+      handle: 'there-and-back-again',
+      url: 'https://eigenscribe.github.io/there-and-back-again/frontmatter.html',
+      color: '#a855f7',
+      colorClass: 'color-3',
+      badgeText: 'Zettelkasten'
+    },
+    research: {
+      id: 'research',
+      name: 'Research Notebook',
+      icon: '📓',
+      handle: 'scriber-labs/research-notebook',
+      url: 'https://scriber-labs.github.io/research-notebook/',
+      color: '#06b6d4',
+      colorClass: 'color-1',
+      badgeText: 'Research Notebook'
+    }
+  };
+
   // Sound Synthesizer via Web Audio API
   var AudioSynth = {
     ctx: null,
@@ -123,9 +157,10 @@
 
   function ScriberWidget(options) {
     this.options = Object.assign({
-      mode: 'compact', // compact | card | platforms | goal | ticker | dock
+      mode: 'compact', // compact | card | platforms | links | goal | ticker | dock
       activeTarget: 'cashapp',
       activePlatform: 'twitch',
+      activeLink: 'landing',
       scale: 1,
       align: 'top-left',
       soundEnabled: true,
@@ -140,11 +175,13 @@
 
     this.targetsList = ['cashapp', 'bmac', 'amazon'];
     this.platformsList = ['twitch', 'velora', 'youtube', 'kick', 'beam'];
+    this.linksList = ['landing', 'zettelkasten', 'research'];
     this.currentTargetIndex = 0;
     this.rotateTimer = null;
     this.confetti = null;
     this.isCardOpen = false;
     this.isPlatformsCardOpen = false;
+    this.isLinksCardOpen = false;
     this.isDockOpen = false;
 
     this.parseURLParams();
@@ -160,6 +197,9 @@
     }
     if (params.has('platform') && PLATFORMS[params.get('platform')]) {
       this.options.activePlatform = params.get('platform');
+    }
+    if (params.has('link') && TSE_LINKS[params.get('link')]) {
+      this.options.activeLink = params.get('link');
     }
     if (params.has('scale')) this.options.scale = parseFloat(params.get('scale')) || 1;
     if (params.has('align')) this.options.align = params.get('align');
@@ -180,6 +220,7 @@
     this.applyConfiguration();
     this.renderActiveTarget();
     this.renderActivePlatform();
+    this.renderActiveLink();
     this.updateGoalHUD();
     this.attachEvents();
     this.connectLiveEvents();
@@ -229,17 +270,19 @@
     var pill = document.getElementById('tse-pill-mode');
     var qrCard = document.getElementById('tse-card-mode');
     var platformsCard = document.getElementById('tse-platforms-mode');
+    var linksCard = document.getElementById('tse-links-mode');
     var goalCard = document.getElementById('tse-goal-mode');
     var tickerBar = document.getElementById('tse-ticker-mode');
     var dockPanel = document.getElementById('tse-dock-mode');
 
-    [pill, qrCard, platformsCard, goalCard, tickerBar, dockPanel].forEach(function (el) {
+    [pill, qrCard, platformsCard, linksCard, goalCard, tickerBar, dockPanel].forEach(function (el) {
       if (el) el.classList.add('hidden');
     });
 
     if (this.options.mode === 'compact' && pill) pill.classList.remove('hidden');
     else if (this.options.mode === 'card' && qrCard) qrCard.classList.remove('hidden');
     else if (this.options.mode === 'platforms' && platformsCard) platformsCard.classList.remove('hidden');
+    else if (this.options.mode === 'links' && linksCard) linksCard.classList.remove('hidden');
     else if (this.options.mode === 'goal' && goalCard) goalCard.classList.remove('hidden');
     else if (this.options.mode === 'ticker' && tickerBar) tickerBar.classList.remove('hidden');
     else if (this.options.mode === 'dock' && dockPanel) dockPanel.classList.remove('hidden');
@@ -278,6 +321,24 @@
           this.setTarget(targetKey);
         }.bind(this));
         tabsContainer.appendChild(tab);
+      }.bind(this));
+    }
+
+    // Populate links tab buttons in links card
+    var linksTabsContainer = document.getElementById('links-tabs');
+    if (linksTabsContainer) {
+      linksTabsContainer.innerHTML = '';
+      this.linksList.forEach(function (key) {
+        var linkItem = TSE_LINKS[key];
+        if (!linkItem) return;
+        var tab = document.createElement('button');
+        tab.className = 'tab-btn tab-' + key + (this.options.activeLink === key ? ' active' : '');
+        tab.innerHTML = '<span>' + linkItem.icon + '</span> ' + linkItem.name;
+        tab.addEventListener('click', function (e) {
+          e.stopPropagation();
+          this.setLink(key);
+        }.bind(this));
+        linksTabsContainer.appendChild(tab);
       }.bind(this));
     }
   };
@@ -391,6 +452,53 @@
     });
   };
 
+  ScriberWidget.prototype.setLink = function (linkKey) {
+    if (!TSE_LINKS[linkKey]) return;
+    this.options.activeLink = linkKey;
+    this.renderActiveLink();
+  };
+
+  ScriberWidget.prototype.renderActiveLink = function () {
+    var linkKey = this.options.activeLink;
+    if (!TSE_LINKS[linkKey]) {
+      linkKey = 'landing';
+    }
+    var item = TSE_LINKS[linkKey];
+    if (typeof document === 'undefined' || !item) return;
+
+    // Update Links Card
+    var qrContainer = document.getElementById('links-qr-code-box');
+    var qrHandle = document.getElementById('links-qr-handle-display');
+    var qrMethodName = document.getElementById('links-qr-method-name');
+
+    if (qrMethodName) qrMethodName.textContent = item.name;
+    if (qrHandle) {
+      var displayHandle = item.handle || item.name;
+      qrHandle.innerHTML = item.icon + ' ' + displayHandle + ' <span style="opacity:0.6;font-size:9px">📋 copy</span>';
+    }
+
+    if (qrContainer && typeof QRCodeGenerator !== 'undefined') {
+      var svgQR = QRCodeGenerator.generateSVG(item.url, {
+        size: 160,
+        margin: 1,
+        colorDark: item.color || '#00f2ff',
+        colorLight: 'transparent',
+        ecc: 'M'
+      });
+      qrContainer.innerHTML = svgQR;
+    }
+
+    // Update active tab styles for links
+    var linksTabs = document.querySelectorAll('#links-tabs .tab-btn');
+    linksTabs.forEach(function (btn) {
+      if (btn.classList.contains('tab-' + item.id)) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  };
+
   ScriberWidget.prototype.updateGoalHUD = function () {
     if (typeof document === 'undefined') return;
     var pct = Math.min(100, Math.round((this.options.goalCurrent / this.options.goalTarget) * 100));
@@ -429,6 +537,7 @@
   ScriberWidget.prototype.toggleCard = function (forceState) {
     var card = document.getElementById('tse-card-mode');
     var platformsCard = document.getElementById('tse-platforms-mode');
+    var linksCard = document.getElementById('tse-links-mode');
     var pill = document.getElementById('tse-pill-mode');
     if (!card) return;
 
@@ -438,17 +547,21 @@
       if (this.isPlatformsCardOpen) {
         this.togglePlatformsCard(false);
       }
+      if (this.isLinksCardOpen) {
+        this.toggleLinksCard(false);
+      }
       card.classList.remove('hidden');
       if (this.options.mode === 'compact' && pill) pill.classList.add('hidden');
     } else {
       card.classList.add('hidden');
-      if (this.options.mode === 'compact' && pill && !this.isPlatformsCardOpen) pill.classList.remove('hidden');
+      if (this.options.mode === 'compact' && pill && !this.isPlatformsCardOpen && !this.isLinksCardOpen) pill.classList.remove('hidden');
     }
   };
 
   ScriberWidget.prototype.togglePlatformsCard = function (forceState) {
     var card = document.getElementById('tse-platforms-mode');
     var donateCard = document.getElementById('tse-card-mode');
+    var linksCard = document.getElementById('tse-links-mode');
     var pill = document.getElementById('tse-pill-mode');
     if (!card) return;
 
@@ -458,11 +571,40 @@
       if (this.isCardOpen) {
         this.toggleCard(false);
       }
+      if (this.isLinksCardOpen) {
+        this.toggleLinksCard(false);
+      }
       card.classList.remove('hidden');
       if (this.options.mode === 'compact' && pill) pill.classList.add('hidden');
+      this.renderActivePlatform();
     } else {
       card.classList.add('hidden');
-      if (this.options.mode === 'compact' && pill && !this.isCardOpen) pill.classList.remove('hidden');
+      if (this.options.mode === 'compact' && pill && !this.isCardOpen && !this.isLinksCardOpen) pill.classList.remove('hidden');
+    }
+  };
+
+  ScriberWidget.prototype.toggleLinksCard = function (forceState) {
+    var card = document.getElementById('tse-links-mode');
+    var donateCard = document.getElementById('tse-card-mode');
+    var platformsCard = document.getElementById('tse-platforms-mode');
+    var pill = document.getElementById('tse-pill-mode');
+    if (!card) return;
+
+    this.isLinksCardOpen = (forceState !== undefined) ? forceState : !this.isLinksCardOpen;
+
+    if (this.isLinksCardOpen) {
+      if (this.isCardOpen) {
+        this.toggleCard(false);
+      }
+      if (this.isPlatformsCardOpen) {
+        this.togglePlatformsCard(false);
+      }
+      card.classList.remove('hidden');
+      if (this.options.mode === 'compact' && pill) pill.classList.add('hidden');
+      this.renderActiveLink();
+    } else {
+      card.classList.add('hidden');
+      if (this.options.mode === 'compact' && pill && !this.isCardOpen && !this.isPlatformsCardOpen) pill.classList.remove('hidden');
     }
   };
 
@@ -545,6 +687,23 @@
     }
   };
 
+  ScriberWidget.prototype.copyLinkItem = function () {
+    var linkKey = this.options.activeLink;
+    if (!TSE_LINKS[linkKey]) linkKey = 'landing';
+    var item = TSE_LINKS[linkKey];
+    if (!item) return;
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(item.url).then(function () {
+        this.showToast('Copied ' + item.name + ' URL to clipboard! ✨');
+      }.bind(this)).catch(function () {
+        this.fallbackCopy(item.url);
+      }.bind(this));
+    } else {
+      this.fallbackCopy(item.url);
+    }
+  };
+
   ScriberWidget.prototype.fallbackCopy = function (text) {
     var textArea = document.createElement('textarea');
     textArea.value = text;
@@ -600,11 +759,12 @@
       });
     }
 
-    // Minimized view Landing Page button click
+    // Minimized view Landing / Links button click triggers Links Card popup
     var pillLandingBtn = document.getElementById('pill-landing-btn');
     if (pillLandingBtn) {
       pillLandingBtn.addEventListener('click', function (e) {
         e.stopPropagation();
+        self.toggleLinksCard(true);
       });
     }
 
@@ -626,6 +786,15 @@
       });
     }
 
+    // Close Links QR Card
+    var closeLinksBtn = document.getElementById('close-links-btn');
+    if (closeLinksBtn) {
+      closeLinksBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.toggleLinksCard(false);
+      });
+    }
+
     // Donate QR Handle badge copy
     var qrHandleBadge = document.getElementById('qr-handle-display');
     if (qrHandleBadge) {
@@ -641,6 +810,15 @@
       platformQrHandleBadge.addEventListener('click', function (e) {
         e.stopPropagation();
         self.copyPlatformLink();
+      });
+    }
+
+    // Links QR Handle badge copy
+    var linksQrHandleBadge = document.getElementById('links-qr-handle-display');
+    if (linksQrHandleBadge) {
+      linksQrHandleBadge.addEventListener('click', function (e) {
+        e.stopPropagation();
+        self.copyLinkItem();
       });
     }
 
@@ -684,6 +862,7 @@
   return {
     PLATFORMS: PLATFORMS,
     DONATION_TARGETS: DONATION_TARGETS,
+    TSE_LINKS: TSE_LINKS,
     AudioSynth: AudioSynth,
     ScriberWidget: ScriberWidget
   };

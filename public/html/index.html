@@ -6,8 +6,8 @@
   <title>The Scriber Experience - Universal OBS Donate Widget</title>
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./assets/images/favicon.png"/>
-  <link rel="shortcut icon" type="image/png" href="./assets/images/favicon.png"/>
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png"/>
+  <link rel="shortcut icon" type="image/png" href="../assets/images/favicon.png"/>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Eagle+Lake&family=MedievalSharp&family=Philosopher&family=UnifrakturMaguntia&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Widget Stylesheet -->
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
 
@@ -46,7 +46,7 @@
          VIEW 1: COMPACT PILL / ON-STREAM INTERACTIVE BUTTON
          ==================================================== -->
     <div id="tse-pill-mode" class="glass-panel glow-border widget-compact-pill" title="The Scriber Experience">
-      <img src="./assets/images/logo.png" alt="TSE Logo" class="brand-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
+      <img src="../assets/images/logo.png" alt="TSE Logo" class="brand-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
       
       <div class="pill-info">
         <div class="pill-title eigenscribe-gradient-text">
@@ -58,13 +58,13 @@
             <span id="pill-action-label">Donate</span>
           </button>
           <button id="pill-platforms-btn" class="btn-hover color-3 pill-action-btn" title="Platforms">
-            <img src="./assets/images/favicon.png" alt="Platforms" class="btn-favicon-emoji emoji">
+            <img src="../assets/images/favicon.png" alt="Platforms" class="btn-favicon-emoji emoji">
             <span>Platforms</span>
           </button>
-          <a id="pill-landing-btn" href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 pill-action-btn pill-landing-btn" title="TSE Landing Page">
+          <button id="pill-landing-btn" class="btn-hover color-7 pill-action-btn pill-landing-btn" title="TSE Links & Research">
             <span class="emoji">🌊</span>
-            <span>TSE Landing Page</span>
-          </a>
+            <span>TSE Links</span>
+          </button>
         </div>
       </div>
     </div>
@@ -75,7 +75,7 @@
     <div id="tse-card-mode" class="glass-panel glow-border widget-qr-card hidden">
       <div class="qr-card-header">
         <div class="qr-card-brand">
-          <img src="./assets/images/logo.png" alt="TSE Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
+          <img src="../assets/images/logo.png" alt="TSE Logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%2314B5FF\'/><text x=\'50\' y=\'62\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\'>✨</text></svg>'">
           <div>
             <div class="qr-card-title eigenscribe-gradient-text">The Scriber Experience</div>
           </div>
@@ -109,7 +109,7 @@
     <div id="tse-platforms-mode" class="glass-panel glow-border widget-qr-card hidden">
       <div class="qr-card-header">
         <div class="qr-card-brand">
-          <img src="./assets/images/favicon.png" alt="Platforms Logo" onerror="this.src='./assets/images/logo.png'">
+          <img src="../assets/images/favicon.png" alt="Platforms Logo" onerror="this.src='../assets/images/logo.png'">
           <div>
             <div class="qr-card-title eigenscribe-gradient-text">Platforms</div>
           </div>
@@ -134,6 +134,40 @@
 
       <div id="platform-qr-handle-display" class="qr-handle-badge" title="Click to copy link">
         😈 twitch.tv/renzoscriber <span style="opacity:0.6;font-size:9px">📋 copy</span>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         VIEW 2C: EXPANDED QR CODE TSE LINKS CARD
+         ==================================================== -->
+    <div id="tse-links-mode" class="glass-panel glow-border widget-qr-card hidden">
+      <div class="qr-card-header">
+        <div class="qr-card-brand">
+          <img src="../assets/images/logo.png" alt="TSE Links Logo" onerror="this.src='../assets/images/favicon.png'">
+          <div>
+            <div class="qr-card-title eigenscribe-gradient-text">TSE Links & Research</div>
+          </div>
+        </div>
+        <button id="close-links-btn" class="close-btn" title="Close">✕</button>
+      </div>
+
+      <!-- TSE Links Tabs (Landing Page, Zettelkasten, Research Notebook) -->
+      <div id="links-tabs" class="donation-method-tabs">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- QR Code Display Box with Auto Generated Crisp SVG -->
+      <div id="links-qr-code-box" class="qr-container">
+        <!-- Dynamic QR SVG Injected Here -->
+      </div>
+
+      <div class="qr-scan-hint">
+        <span>📱 Scan with camera to open</span>
+        <span id="links-qr-method-name" class="neon-cyan-text">TSE Landing Page</span>
+      </div>
+
+      <div id="links-qr-handle-display" class="qr-handle-badge" title="Click to copy link">
+        🌊 the-scriber-experience <span style="opacity:0.6;font-size:9px">📋 copy</span>
       </div>
     </div>
 
@@ -178,7 +212,7 @@
          ==================================================== -->
     <div id="tse-ticker-mode" class="glass-panel glow-border widget-ticker-bar hidden">
       <div class="ticker-left">
-        <img src="./assets/images/logo.png" style="width:28px;height:28px;border-radius:50%;" alt="logo" onerror="this.style.display='none'">
+        <img src="../assets/images/logo.png" style="width:28px;height:28px;border-radius:50%;" alt="logo" onerror="this.style.display='none'">
         <span class="eigenscribe-gradient-text" style="font-size:12px;font-weight:bold;">The Scriber Experience</span>
       </div>
 
@@ -231,6 +265,7 @@
             <option value="compact">Compact Pill (Default)</option>
             <option value="card">On-Stream QR Card</option>
             <option value="platforms">Platforms QR Card</option>
+            <option value="links">TSE Links QR Card</option>
             <option value="goal">Goal Progress Bar</option>
             <option value="ticker">Full Bottom Ticker</option>
             <option value="dock">Control Dock</option>
@@ -282,7 +317,13 @@
         <a href="https://cash.app/$renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-5 dock-channel-btn"><span class="emoji">💸</span> Cash App</a>
         <a href="https://www.buymeacoffee.com/renzoscriber" target="_blank" rel="noopener noreferrer" class="btn-hover color-2 dock-channel-btn"><span class="emoji">☕</span> Buy Me a Coffee</a>
         <a href="https://www.amazon.com/hz/wishlist/ls/4YHE4NZD3W98?ref_=wl_share" target="_blank" rel="noopener noreferrer" class="btn-hover color-4 dock-channel-btn"><span class="emoji">📦</span> Amazon Wishlist</a>
-        <a href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 dock-channel-btn"><span class="emoji">🌊</span> TSE Landing Page</a>
+      </div>
+
+      <div style="font-size:11.5px;color:#cbd5e1;font-weight:700;margin-top:4px;">🌊 TSE Pages, Notebooks & Research</div>
+      <div class="dock-links-grid">
+        <a href="https://the-scriber-experience.github.io/tse-landing-page/" target="_blank" rel="noopener noreferrer" class="btn-hover color-9 dock-channel-btn"><span class="emoji">🌊</span> TSE Landing</a>
+        <a href="https://eigenscribe.github.io/there-and-back-again/frontmatter.html" target="_blank" rel="noopener noreferrer" class="btn-hover color-3 dock-channel-btn"><span class="emoji">🔮</span> Zettelkasten</a>
+        <a href="https://scriber-labs.github.io/research-notebook/" target="_blank" rel="noopener noreferrer" class="btn-hover color-1 dock-channel-btn"><span class="emoji">📓</span> Research Notebook</a>
       </div>
 
       <div style="font-size:10px;color:#94a3b8;text-align:center;">
@@ -293,9 +334,9 @@
   </div>
 
   <!-- Load Scripts -->
-  <script src="./qr-generator.js"></script>
-  <script src="./confetti.js"></script>
-  <script src="./widget.js"></script>
+  <script src="../js/qr-generator.js"></script>
+  <script src="../js/confetti.js"></script>
+  <script src="../js/widget.js"></script>
 
   <script>
     // Initialize Widget Instance

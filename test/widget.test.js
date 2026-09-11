@@ -4,8 +4,8 @@ const http = require('node:http');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const QRCodeGenerator = require('../public/qr-generator');
-const { PLATFORMS, DONATION_TARGETS, ScriberWidget } = require('../public/widget');
+const QRCodeGenerator = require('../public/js/qr-generator');
+const { PLATFORMS, DONATION_TARGETS, TSE_LINKS, ScriberWidget } = require('../public/js/widget');
 const { server, startServer, broadcastEvent, sseClients } = require('../server');
 
 test('QR Code Generator tests', async (t) => {
@@ -62,6 +62,19 @@ test('Multistream Platforms & Targets configuration integrity', async (t) => {
     assert.strictEqual(DONATION_TARGETS.bmac.handle, 'renzoscriber');
     assert.strictEqual(DONATION_TARGETS.landing.name, 'TSE Landing Page');
   });
+
+  await t.test('contains all TSE links & notebooks with proper URLs', () => {
+    const expectedLinks = ['landing', 'zettelkasten', 'research'];
+    for (const key of expectedLinks) {
+      assert.ok(TSE_LINKS[key], `Link ${key} exists`);
+      assert.ok(TSE_LINKS[key].url.startsWith('https://'), `Link ${key} has https URL`);
+      assert.ok(TSE_LINKS[key].icon, `Link ${key} has icon`);
+    }
+
+    assert.strictEqual(TSE_LINKS.landing.url, 'https://the-scriber-experience.github.io/tse-landing-page/');
+    assert.strictEqual(TSE_LINKS.zettelkasten.url, 'https://eigenscribe.github.io/there-and-back-again/frontmatter.html');
+    assert.strictEqual(TSE_LINKS.research.url, 'https://scriber-labs.github.io/research-notebook/');
+  });
 });
 
 test('ScriberWidget logic & state math', async (t) => {
@@ -77,12 +90,15 @@ test('ScriberWidget logic & state math', async (t) => {
     assert.strictEqual(widget.options.goalTarget, 200);
     assert.strictEqual(widget.options.activeTarget, 'cashapp');
     assert.strictEqual(widget.options.activePlatform, 'twitch');
+    assert.strictEqual(widget.options.activeLink, 'landing');
     assert.strictEqual(widget.options.autoRotate, false);
     assert.strictEqual(widget.rotateTimer, null);
     assert.strictEqual(widget.isCardOpen, false);
     assert.strictEqual(widget.isPlatformsCardOpen, false);
+    assert.strictEqual(widget.isLinksCardOpen, false);
     assert.deepStrictEqual(widget.targetsList, ['cashapp', 'bmac', 'amazon'], 'targetsList only contains donation targets');
     assert.deepStrictEqual(widget.platformsList, ['twitch', 'velora', 'youtube', 'kick', 'beam'], 'platformsList contains streaming platforms');
+    assert.deepStrictEqual(widget.linksList, ['landing', 'zettelkasten', 'research'], 'linksList contains TSE links');
   });
 
   await t.test('cycles targets sequentially on nextTarget()', () => {
@@ -108,6 +124,17 @@ test('ScriberWidget logic & state math', async (t) => {
 
     widget.setPlatform('kick');
     assert.strictEqual(widget.options.activePlatform, 'kick');
+  });
+
+  await t.test('sets active link correctly on setLink()', () => {
+    const widget = new ScriberWidget();
+    assert.strictEqual(widget.options.activeLink, 'landing');
+
+    widget.setLink('zettelkasten');
+    assert.strictEqual(widget.options.activeLink, 'zettelkasten');
+
+    widget.setLink('research');
+    assert.strictEqual(widget.options.activeLink, 'research');
   });
 });
 
@@ -138,22 +165,29 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(html.includes('id="tse-pill-mode"'), 'Contains pill mode element');
     assert.ok(html.includes('id="tse-card-mode"'), 'Contains card mode element');
     assert.ok(html.includes('id="tse-platforms-mode"'), 'Contains platforms card mode element');
+    assert.ok(html.includes('id="tse-links-mode"'), 'Contains links card mode element');
     assert.ok(html.includes('id="pill-platforms-btn"'), 'Contains dedicated platforms button in minimized view');
     assert.ok(html.includes('class="pill-buttons-row"'), 'Contains button row in minimized view under title');
     assert.ok(html.includes('id="pill-action-btn" class="btn-hover color-9 pill-action-btn"'), 'Donate button is blue color-9');
-    assert.ok(html.includes('src="./assets/images/favicon.png"'), 'Favicon image is used in index.html');
+    assert.ok(html.includes('src="../assets/images/favicon.png"'), 'Favicon image is used in index.html');
     assert.ok(html.includes('class="btn-favicon-emoji emoji"'), 'Favicon image is used as the emoji at the beginning of the button text');
     assert.ok(html.includes('Platforms</span>'), 'Button text includes Platforms');
     assert.ok(html.includes('id="platforms-tabs"'), 'Contains platforms tabs container');
     assert.ok(html.includes('id="platform-qr-code-box"'), 'Contains platform QR code box');
+    assert.ok(html.includes('id="links-tabs"'), 'Contains links tabs container');
+    assert.ok(html.includes('id="links-qr-code-box"'), 'Contains links QR code box');
     assert.ok(!html.includes('id="multistream-cluster"'), 'Replaced old multistream cluster row with platforms button');
-    assert.ok(html.includes('id="pill-landing-btn"'), 'Contains dedicated landing page button in minimized view');
-    assert.ok(html.includes('TSE Landing Page'), 'Contains TSE Landing Page name');
+    assert.ok(html.includes('id="pill-landing-btn"'), 'Contains dedicated landing/links button in minimized view');
+    assert.ok(html.includes('TSE Links'), 'Contains TSE Links name');
     assert.ok(!html.includes('TSE All Links'), 'Does not contain TSE All Links');
+
+    // Request /html/index.html
+    const htmlSubRes = await fetch(`http://localhost:${TEST_PORT}/html/index.html`);
+    assert.strictEqual(htmlSubRes.status, 200);
   });
 
   await t.test('serves CSS stylesheet with glassmorphism, space background & gradients', async () => {
-    const res = await fetch(`http://localhost:${TEST_PORT}/styles.css`);
+    const res = await fetch(`http://localhost:${TEST_PORT}/css/styles.css`);
     assert.strictEqual(res.status, 200);
     const css = await res.text();
     assert.ok(css.includes('--gradient-brand'), 'Contains TSE gradient definition');
@@ -164,6 +198,25 @@ test('Server & HTTP / Live API integration tests', async (t) => {
     assert.ok(css.includes('.pill-buttons-row'), 'Contains pill buttons row styles');
     assert.ok(css.includes('.btn-favicon-emoji'), 'Contains btn-favicon-emoji style');
     assert.ok(css.includes('.tab-twitch.active'), 'Contains platform tab active gradient style');
+    assert.ok(css.includes('.tab-landing.active'), 'Contains landing tab active gradient style');
+    assert.ok(css.includes('.tab-zettelkasten.active'), 'Contains zettelkasten tab active gradient style');
+    assert.ok(css.includes('.tab-research.active'), 'Contains research tab active gradient style');
+
+    // Fallback request /styles.css
+    const fallbackCssRes = await fetch(`http://localhost:${TEST_PORT}/styles.css`);
+    assert.strictEqual(fallbackCssRes.status, 200);
+  });
+
+  await t.test('serves JavaScript widget and utility files from js subfolder', async () => {
+    const jsRes = await fetch(`http://localhost:${TEST_PORT}/js/widget.js`);
+    assert.strictEqual(jsRes.status, 200);
+    assert.strictEqual(jsRes.headers.get('content-type'), 'application/javascript; charset=utf-8');
+
+    const qrRes = await fetch(`http://localhost:${TEST_PORT}/js/qr-generator.js`);
+    assert.strictEqual(qrRes.status, 200);
+
+    const confettiRes = await fetch(`http://localhost:${TEST_PORT}/js/confetti.js`);
+    assert.strictEqual(confettiRes.status, 200);
   });
 
   await t.test('serves spacebackground image assets correctly', async () => {
